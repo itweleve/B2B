@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品目录展示 | Product Catalog</title>
+    <!-- 引入 Tailwind CSS 快速构建精美布局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 隐藏滚动条让界面更清爽 (仅针对左侧菜单) */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm h-16 flex items-center px-6 z-10 shrink-0">
+        <h1 class="text-2xl font-bold text-blue-600">YourBrand 精选图册</h1>
+    </header>
+
+    <!-- 主体布局区 (适配 PC 和 手机) -->
+    <!-- PC端是 flex-row (左右排列)，手机端是 flex-col (上下排列) -->
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-[1600px] w-full mx-auto bg-white shadow-lg">
+
+        <!-- 左侧：固定目录 (PC端固定高度滚动，手机端横向滚动) -->
+        <!-- md:w-64 表示PC端宽度，w-full 表示手机端全宽 -->
+        <aside class="w-full md:w-64 bg-gray-50 border-r border-b md:border-b-0 border-gray-200 shrink-0 flex flex-col">
+            <div class="p-4 border-b border-gray-200 hidden md:block">
+                <h2 class="font-bold text-gray-600">产品目录 (20款)</h2>
+            </div>
+            <!-- 目录列表容器 -->
+            <nav id="catalog-list" class="flex md:flex-col overflow-x-auto md:overflow-y-auto no-scrollbar p-2 md:p-0 space-x-2 md:space-x-0 md:space-y-1">
+                <!-- JavaScript 会自动把 20 个按钮塞进这里 -->
+            </nav>
+        </aside>
+
+        <!-- 中间：商品图片 -->
+        <!-- md:w-1/2 让图片区占据一半空间 -->
+        <main class="w-full md:w-1/2 bg-white flex items-center justify-center p-6 h-[40vh] md:h-auto shrink-0 border-b md:border-b-0 md:border-r border-gray-200">
+            <img id="product-image" src="" alt="商品图片" class="max-w-full max-h-full object-contain drop-shadow-lg transition-opacity duration-300">
+        </main>
+
+        <!-- 右侧：商品介绍文字 -->
+        <section class="w-full md:w-auto flex-1 p-8 overflow-y-auto">
+            <div class="max-w-2xl">
+                <span id="product-category" class="text-sm font-semibold text-blue-600 tracking-wider uppercase mb-2 block">产品分类</span>
+                <h1 id="product-title" class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 transition-opacity duration-300">商品名称</h1>
+                <p id="product-price" class="text-2xl font-bold text-gray-700 mb-6 border-b pb-6 border-gray-200">¥ 0.00</p>
+                
+                <h3 class="text-lg font-bold text-gray-800 mb-2">产品说明</h3>
+                <p id="product-desc" class="text-gray-600 leading-relaxed mb-8 whitespace-pre-line transition-opacity duration-300">这里是介绍文字...</p>
+
+                <!-- 可以自己添加的静态区域（比如询盘按钮或公司信息） -->
+                <div class="bg-blue-50 p-6 rounded-lg mt-8">
+                    <h4 class="font-bold text-blue-800 mb-2">获取详细报价单</h4>
+                    <p class="text-sm text-blue-600 mb-4">如果您对该产品感兴趣，请联系我们。</p>
+                    <a href="mailto:your-email@example.com" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">发送邮件咨询</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 核心 JavaScript 逻辑 -->
+    <script>
+        // ==========================================
+        // 📦 1. 在这里修改你的 20 款商品数据
+        // ==========================================
+        // 你可以随意增删数组里的对象，或者修改内容
+        // image: 填图片的直链 (必须是可以直接打开的图片网址，以 .jpg/.png 结尾最佳)
+        // title: 商品名称
+        // price: 价格
+        // category: 分类标签
+        // desc: 详细描述 (用 \n 可以换行)
+        const products = [
+            {
+                id: 1,
+                title: "极简商务双肩包",
+                category: "箱包系列",
+                price: "¥ 299.00",
+                image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+                desc: "采用防泼水尼龙面料，耐磨抗撕裂。\n内置15.6寸电脑隔层，多仓位设计。\n人体工学背负系统，减轻肩部压力。"
+            },
+            {
+                id: 2,
+                title: "智能运动手环",
+                category: "穿戴设备",
+                price: "¥ 199.00",
+                image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
+                desc: "全天候心率监测与血氧检测。\n支持20种运动模式，5ATM防水。\n超长续航，一次充电可用14天。"
+            },
+            {
+                id: 3,
+                title: "便携式咖啡机",
+                category: "生活电器",
+                price: "¥ 459.00",
+                image: "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80",
+                desc: "无需插电，手动按压萃取。\n兼容胶囊与咖啡粉，随时随地享受意式浓缩。\n食品级材质，小巧轻便易携带。"
+            },
+            {
+                id: 4,
+                title: "降噪头戴耳机",
+                category: "影音娱乐",
+                price: "¥ 899.00",
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+                desc: "主动降噪深度达 40dB。\n40mm 动圈单元，Hi-Res 金标认证。\n记忆海绵耳罩，久戴不累。"
+            },
+            {
+                id: 5,
+                title: "复古机械键盘",
+                category: "电脑外设",
+                price: "¥ 399.00",
+                image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=800&q=80",
+                desc: "紧凑型 87 键布局，节省桌面空间。\n热插拔轴座，支持全键无冲。\n复古打字机键帽，PBT 材质不打油。"
+            },
+            // ... 为了演示只写了5个，你需要按照上面的格式继续添加，直到 20 个 ...
+            // 复制上面的花括号 {} 部分，粘贴在后面，修改内容即可
+        ];
+
+        // ==========================================
+        // ⚙️ 2. 系统自动渲染逻辑 (你不需要修改下面代码)
+        // ==========================================
+        
+        const catalogList = document.getElementById('catalog-list');
+        const productImage = document.getElementById('product-image');
+        const productTitle = document.getElementById('product-title');
+        const productPrice = document.getElementById('product-price');
+        const productCategory = document.getElementById('product-category');
+        const productDesc = document.getElementById('product-desc');
+
+        // 初始化：生成左侧目录
+        function initCatalog() {
+            products.forEach((product, index) => {
+                const btn = document.createElement('button');
+                // 基础样式
+                btn.className = "text-left px-4 py-3 whitespace-nowrap md:whitespace-normal rounded-md transition-colors duration-200 focus:outline-none";
+                btn.innerHTML = `<span class="text-xs text-gray-400 block">${(index+1).toString().padStart(2, '0')}</span> ${product.title}`;
+                
+                // 绑定点击事件
+                btn.onclick = () => loadProduct(index);
+                
+                // 为按钮加上 id 方便后续高亮
+                btn.id = `catalog-btn-${index}`;
+                catalogList.appendChild(btn);
+            });
+            
+            // 默认加载第一个产品
+            if(products.length > 0) {
+                loadProduct(0);
+            }
+        }
+
+        // 核心切换逻辑
+        function loadProduct(index) {
+            const product = products[index];
+
+            // 1. 更新高亮状态
+            products.forEach((_, i) => {
+                const btn = document.getElementById(`catalog-btn-${i}`);
+                if (i === index) {
+                    btn.className = "text-left px-4 py-3 whitespace-nowrap md:whitespace-normal rounded-md transition-colors duration-200 focus:outline-none bg-blue-600 text-white shadow-sm";
+                } else {
+                    btn.className = "text-left px-4 py-3 whitespace-nowrap md:whitespace-normal rounded-md transition-colors duration-200 focus:outline-none text-gray-600 hover:bg-gray-200";
+                }
+            });
+
+            // 2. 先隐藏内容（做一个淡出效果）
+            productImage.style.opacity = 0;
+            productTitle.style.opacity = 0;
+            productDesc.style.opacity = 0;
+
+            // 3. 稍微延迟一下（200毫秒）后替换内容并显示（做一个淡入效果）
+            setTimeout(() => {
+                productImage.src = product.image;
+                productTitle.textContent = product.title;
+                productCategory.textContent = product.category || '精选产品';
+                productPrice.textContent = product.price || '面议';
+                productDesc.textContent = product.desc;
+
+                productImage.style.opacity = 1;
+                productTitle.style.opacity = 1;
+                productDesc.style.opacity = 1;
+            }, 200);
+        }
+
+        // 启动程序
+        initCatalog();
+    </script>
+</body>
+</html>
