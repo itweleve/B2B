@@ -3,13 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品目录展示 | Product Catalog</title>
-    <!-- 引入 Tailwind CSS 快速构建精美布局 -->
+    <title>产品目录展示 | 多图滑动版</title>
+    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Swiper 轮播图 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* 隐藏滚动条让界面更清爽 (仅针对左侧菜单) */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 定制 Swiper 的样式，让滑动按钮好看一点 */
+        .swiper-button-next, .swiper-button-prev {
+            color: #2563eb; /* 蓝色 */
+            background: rgba(255, 255, 255, 0.8);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .swiper-button-next:after, .swiper-button-prev:after {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .swiper-pagination-bullet-active {
+            background-color: #2563eb !important;
+        }
+        /* 确保图片居中且不变形 */
+        .swiper-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans h-screen flex flex-col overflow-hidden">
@@ -19,26 +44,33 @@
         <h1 class="text-2xl font-bold text-blue-600">YourBrand 精选图册</h1>
     </header>
 
-    <!-- 主体布局区 (适配 PC 和 手机) -->
-    <!-- PC端是 flex-row (左右排列)，手机端是 flex-col (上下排列) -->
+    <!-- 主体布局区 -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-[1600px] w-full mx-auto bg-white shadow-lg">
 
-        <!-- 左侧：固定目录 (PC端固定高度滚动，手机端横向滚动) -->
-        <!-- md:w-64 表示PC端宽度，w-full 表示手机端全宽 -->
+        <!-- 左侧：固定目录 -->
         <aside class="w-full md:w-64 bg-gray-50 border-r border-b md:border-b-0 border-gray-200 shrink-0 flex flex-col">
             <div class="p-4 border-b border-gray-200 hidden md:block">
-                <h2 class="font-bold text-gray-600">产品目录 (20款)</h2>
+                <h2 class="font-bold text-gray-600">产品目录</h2>
             </div>
-            <!-- 目录列表容器 -->
             <nav id="catalog-list" class="flex md:flex-col overflow-x-auto md:overflow-y-auto no-scrollbar p-2 md:p-0 space-x-2 md:space-x-0 md:space-y-1">
-                <!-- JavaScript 会自动把 20 个按钮塞进这里 -->
+                <!-- JS 生成目录 -->
             </nav>
         </aside>
 
-        <!-- 中间：商品图片 -->
-        <!-- md:w-1/2 让图片区占据一半空间 -->
-        <main class="w-full md:w-1/2 bg-white flex items-center justify-center p-6 h-[40vh] md:h-auto shrink-0 border-b md:border-b-0 md:border-r border-gray-200">
-            <img id="product-image" src="" alt="商品图片" class="max-w-full max-h-full object-contain drop-shadow-lg transition-opacity duration-300">
+        <!-- 中间：商品图片滑动区 (Swiper) -->
+        <main class="w-full md:w-1/2 bg-gray-50 flex items-center justify-center h-[45vh] md:h-auto shrink-0 border-b md:border-b-0 md:border-r border-gray-200 relative">
+            
+            <!-- Swiper 容器 -->
+            <div class="swiper mySwiper w-full h-full">
+                <div id="swiper-wrapper" class="swiper-wrapper">
+                    <!-- JS 会动态把商品图片塞进这里 -->
+                </div>
+                <!-- 左右箭头和底部小圆点 -->
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+
         </main>
 
         <!-- 右侧：商品介绍文字 -->
@@ -51,7 +83,6 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-2">产品说明</h3>
                 <p id="product-desc" class="text-gray-600 leading-relaxed mb-8 whitespace-pre-line transition-opacity duration-300">这里是介绍文字...</p>
 
-                <!-- 可以自己添加的静态区域（比如询盘按钮或公司信息） -->
                 <div class="bg-blue-50 p-6 rounded-lg mt-8">
                     <h4 class="font-bold text-blue-800 mb-2">获取详细报价单</h4>
                     <p class="text-sm text-blue-600 mb-4">如果您对该产品感兴趣，请联系我们。</p>
@@ -62,24 +93,26 @@
 
     </div>
 
-    <!-- 核心 JavaScript 逻辑 -->
+    <!-- 引入 Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <script>
         // ==========================================
-        // 📦 1. 在这里修改你的 20 款商品数据
+        // 📦 1. 在这里修改你的商品数据
         // ==========================================
-        // 你可以随意增删数组里的对象，或者修改内容
-        // image: 填图片的直链 (必须是可以直接打开的图片网址，以 .jpg/.png 结尾最佳)
-        // title: 商品名称
-        // price: 价格
-        // category: 分类标签
-        // desc: 详细描述 (用 \n 可以换行)
+        // ⚠️ 注意：images 现在是一个数组 [ ]，里面可以放多张图片的链接。
+        // 用英文逗号隔开，每一行放一个网址。
         const products = [
             {
                 id: 1,
                 title: "极简商务双肩包",
                 category: "箱包系列",
                 price: "¥ 299.00",
-                image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+                images: [
+                    "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80", 
+                    "https://images.unsplash.com/photo-1546938576-6e6a64f317cc?w=800&q=80",
+                    "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&q=80"
+                ],
                 desc: "采用防泼水尼龙面料，耐磨抗撕裂。\n内置15.6寸电脑隔层，多仓位设计。\n人体工学背负系统，减轻肩部压力。"
             },
             {
@@ -87,7 +120,10 @@
                 title: "智能运动手环",
                 category: "穿戴设备",
                 price: "¥ 199.00",
-                image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
+                images: [
+                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
+                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
+                ],
                 desc: "全天候心率监测与血氧检测。\n支持20种运动模式，5ATM防水。\n超长续航，一次充电可用14天。"
             },
             {
@@ -95,59 +131,57 @@
                 title: "便携式咖啡机",
                 category: "生活电器",
                 price: "¥ 459.00",
-                image: "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80",
+                images: [
+                    "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80",
+                    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80"
+                ],
                 desc: "无需插电，手动按压萃取。\n兼容胶囊与咖啡粉，随时随地享受意式浓缩。\n食品级材质，小巧轻便易携带。"
-            },
-            {
-                id: 4,
-                title: "降噪头戴耳机",
-                category: "影音娱乐",
-                price: "¥ 899.00",
-                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
-                desc: "主动降噪深度达 40dB。\n40mm 动圈单元，Hi-Res 金标认证。\n记忆海绵耳罩，久戴不累。"
-            },
-            {
-                id: 5,
-                title: "复古机械键盘",
-                category: "电脑外设",
-                price: "¥ 399.00",
-                image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=800&q=80",
-                desc: "紧凑型 87 键布局，节省桌面空间。\n热插拔轴座，支持全键无冲。\n复古打字机键帽，PBT 材质不打油。"
-            },
-            // ... 为了演示只写了5个，你需要按照上面的格式继续添加，直到 20 个 ...
-            // 复制上面的花括号 {} 部分，粘贴在后面，修改内容即可
+            }
+            // 继续往下复制花括号 {} 添加更多商品，直到 20 个...
         ];
 
         // ==========================================
-        // ⚙️ 2. 系统自动渲染逻辑 (你不需要修改下面代码)
+        // ⚙️ 2. 系统渲染逻辑 (不需要修改)
         // ==========================================
         
         const catalogList = document.getElementById('catalog-list');
-        const productImage = document.getElementById('product-image');
         const productTitle = document.getElementById('product-title');
         const productPrice = document.getElementById('product-price');
         const productCategory = document.getElementById('product-category');
         const productDesc = document.getElementById('product-desc');
+        const swiperWrapper = document.getElementById('swiper-wrapper');
 
-        // 初始化：生成左侧目录
+        let swiperInstance = null; // 存放滑动组件的实例
+
+        // 初始化 Swiper
+        function initSwiper() {
+            swiperInstance = new Swiper(".mySwiper", {
+                loop: false,
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+
+        // 生成左侧目录
         function initCatalog() {
             products.forEach((product, index) => {
                 const btn = document.createElement('button');
-                // 基础样式
                 btn.className = "text-left px-4 py-3 whitespace-nowrap md:whitespace-normal rounded-md transition-colors duration-200 focus:outline-none";
                 btn.innerHTML = `<span class="text-xs text-gray-400 block">${(index+1).toString().padStart(2, '0')}</span> ${product.title}`;
-                
-                // 绑定点击事件
                 btn.onclick = () => loadProduct(index);
-                
-                // 为按钮加上 id 方便后续高亮
                 btn.id = `catalog-btn-${index}`;
                 catalogList.appendChild(btn);
             });
             
-            // 默认加载第一个产品
             if(products.length > 0) {
                 loadProduct(0);
+                initSwiper(); // 首次初始化轮播图
             }
         }
 
@@ -155,7 +189,7 @@
         function loadProduct(index) {
             const product = products[index];
 
-            // 1. 更新高亮状态
+            // 1. 更新左侧高亮
             products.forEach((_, i) => {
                 const btn = document.getElementById(`catalog-btn-${i}`);
                 if (i === index) {
@@ -165,26 +199,38 @@
                 }
             });
 
-            // 2. 先隐藏内容（做一个淡出效果）
-            productImage.style.opacity = 0;
+            // 2. 更新右侧文字（加一点淡出淡入效果）
             productTitle.style.opacity = 0;
             productDesc.style.opacity = 0;
-
-            // 3. 稍微延迟一下（200毫秒）后替换内容并显示（做一个淡入效果）
             setTimeout(() => {
-                productImage.src = product.image;
                 productTitle.textContent = product.title;
                 productCategory.textContent = product.category || '精选产品';
                 productPrice.textContent = product.price || '面议';
                 productDesc.textContent = product.desc;
-
-                productImage.style.opacity = 1;
                 productTitle.style.opacity = 1;
                 productDesc.style.opacity = 1;
             }, 200);
+
+            // 3. 更新中间轮播图图片
+            // 清空旧图片
+            swiperWrapper.innerHTML = '';
+            
+            // 遍历当前商品的 images 数组，生成新的 slide
+            product.images.forEach(imgUrl => {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                slide.innerHTML = `<img src="${imgUrl}" alt="${product.title}" class="max-w-full max-h-full object-contain drop-shadow-lg rounded-lg">`;
+                swiperWrapper.appendChild(slide);
+            });
+
+            // 4. 通知 Swiper 更新数据并回到第一张
+            if (swiperInstance) {
+                swiperInstance.update(); // 刷新组件
+                swiperInstance.slideTo(0); // 回到第一张
+            }
         }
 
-        // 启动程序
+        // 启动
         initCatalog();
     </script>
 </body>
