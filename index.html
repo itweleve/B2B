@@ -104,7 +104,7 @@
             <div class="max-w-3xl">
                 <span id="product-category" class="text-sm font-semibold text-blue-600 tracking-wider uppercase mb-2 block">产品分类</span>
                 <h1 id="product-title" class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 transition-opacity duration-300">商品名称</h1>
-                <p id="product-price" class="text-2xl font-bold text-gray-700 mb-6 border-b pb-6 border-gray-200">售价：0.00</p>
+                <p id="product-price" class="text-2xl font-bold text-gray-700 mb-6 border-b pb-6 border-gray-200 whitespace-pre-line">售价：0.00</p>
                 
                 <h3 class="text-lg font-bold text-gray-800 mb-4">产品说明</h3>
                 <p id="product-desc" class="text-gray-600 leading-relaxed mb-8 whitespace-pre-line text-base md:text-lg transition-opacity duration-300">这里是介绍文字...</p>
@@ -374,7 +374,7 @@
                 productTitle.textContent = product.title;
                 productCategory.textContent = product.category || '精选产品';
                 productPrice.textContent = product.price || '面议';
-                productDesc.textContent = product.desc;
+                productDesc.innerHTML = product.desc;
                 productTitle.style.opacity = 1;
                 productDesc.style.opacity = 1;
             }, 200);
