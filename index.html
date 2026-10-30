@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品目录展示</title>
+    <title>产品目录展示 | PC手机完美适配</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -35,7 +35,7 @@
             max-height: 100%;
             object-fit: contain;
             border-radius: 0.5rem;
-            cursor: zoom-in; /* 提示可以点击放大 */
+            cursor: zoom-in;
         }
 
         /* 左右箭头样式 */
@@ -68,10 +68,10 @@
     </header>
 
     <!-- 主体布局区 -->
+    <!-- md:flex-row 保证在电脑上是左右排列 -->
     <div class="max-w-[1600px] w-full mx-auto bg-white shadow-lg min-h-screen flex flex-col md:flex-row">
 
         <!-- 左侧：固定目录 -->
-        <!-- 手机端横向滚动，PC端左侧固定且独立滚动 -->
         <aside class="w-full md:w-64 bg-gray-50 border-r border-b md:border-b-0 border-gray-200 shrink-0 sticky top-16 z-40 md:h-[calc(100vh-4rem)] flex flex-col">
             <div class="p-4 border-b border-gray-200 hidden md:block">
                 <h2 class="font-bold text-gray-600">产品目录</h2>
@@ -81,43 +81,40 @@
             </nav>
         </aside>
 
-        <!-- 右侧内容区 -->
-        <div class="flex-1 flex flex-col">
+        <!-- 中间：图片滑动区 -->
+        <!-- 移除了原本的错误包裹层，让它直接和文字区平级 -->
+        <div id="image-container" class="w-full md:w-1/2 lg:w-[60%] bg-gray-50 sticky top-16 z-20 border-b md:border-b-0 md:border-r border-gray-200 flex items-center justify-center transition-all duration-75"
+             style="height: 45vh; min-height: 200px;">
             
-            <!-- 中间：图片滑动区 (包含缩小动画) -->
-            <!-- sticky top-16 保证向下滚动时图片贴在顶部，高度由 JS 动态改变 -->
-            <div id="image-container" class="w-full bg-gray-50 sticky top-16 z-20 border-b border-gray-200 flex items-center justify-center transition-all duration-75"
-                 style="height: 45vh; min-height: 200px;">
-                
-                <!-- 左箭头 -->
-                <div class="nav-arrow left-2" onclick="slideImage(-1)">&lt;</div>
+            <!-- 左箭头 -->
+            <div class="nav-arrow left-4" onclick="slideImage(-1)">&lt;</div>
 
-                <!-- 滑动容器 -->
-                <div id="image-slider" class="native-slider w-full h-full no-scrollbar">
-                    <!-- JS 塞入图片 -->
-                </div>
-
-                <!-- 右箭头 -->
-                <div class="nav-arrow right-2" onclick="slideImage(1)">&gt;</div>
+            <!-- 滑动容器 -->
+            <div id="image-slider" class="native-slider w-full h-full no-scrollbar">
+                <!-- JS 塞入图片 -->
             </div>
 
-            <!-- 文字介绍区 (随页面滚动) -->
-            <section class="w-full p-6 md:p-10 bg-white z-10 relative">
-                <div class="max-w-3xl">
-                    <span id="product-category" class="text-sm font-semibold text-blue-600 tracking-wider uppercase mb-2 block">产品分类</span>
-                    <h1 id="product-title" class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 transition-opacity duration-300">商品名称</h1>
-                    <p id="product-price" class="text-2xl font-bold text-gray-700 mb-6 border-b pb-6 border-gray-200">¥ 0.00</p>
-                    
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">产品说明</h3>
-                    <p id="product-desc" class="text-gray-600 leading-relaxed mb-8 whitespace-pre-line text-lg transition-opacity duration-300">这里是介绍文字...</p>
-                </div>
-            </section>
-
+            <!-- 右箭头 -->
+            <div class="nav-arrow right-4" onclick="slideImage(1)">&gt;</div>
         </div>
+
+        <!-- 右侧：文字介绍区 -->
+        <!-- md:h-[calc(100vh-4rem)] 和 md:overflow-y-auto 确保电脑端文字过多时在此区域内独立滚动 -->
+        <section class="w-full md:flex-1 p-6 md:p-10 bg-white z-10 relative md:h-[calc(100vh-4rem)] md:overflow-y-auto">
+            <div class="max-w-3xl">
+                <span id="product-category" class="text-sm font-semibold text-blue-600 tracking-wider uppercase mb-2 block">产品分类</span>
+                <h1 id="product-title" class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 transition-opacity duration-300">商品名称</h1>
+                <p id="product-price" class="text-2xl font-bold text-gray-700 mb-6 border-b pb-6 border-gray-200">售价：0.00</p>
+                
+                <h3 class="text-lg font-bold text-gray-800 mb-4">产品说明</h3>
+                <p id="product-desc" class="text-gray-600 leading-relaxed mb-8 whitespace-pre-line text-base md:text-lg transition-opacity duration-300">这里是介绍文字...</p>
+            </div>
+        </section>
+
     </div>
 
-    <!-- 全屏图片放大预览层 (默认隐藏) -->
-    <div id="lightbox" class="fixed inset-0 bg-black/90 z-[100] hidden flex items-center justify-center p-4 cursor-zoom-out" onclick="closeLightbox()">
+    <!-- 全屏图片放大预览层 -->
+    <div id="lightbox" class="fixed inset-0 bg-black/90 z-[100] hidden items-center justify-center p-4 cursor-zoom-out" onclick="closeLightbox()">
         <img id="lightbox-img" src="" alt="大图预览" class="max-w-full max-h-full object-contain drop-shadow-2xl">
     </div>
 
@@ -126,7 +123,7 @@
         // 📦 1. 商品数据
         // ==========================================
         const products = [
-            {
+             {
                 id: 1,
                 title: "0701",
                 category: "休闲鞋",
@@ -326,11 +323,10 @@
                 ],
                 desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
             }
-        
         ];
 
         // ==========================================
-        // ⚙️ 2. 系统渲染与交互逻辑 (无需修改)
+        // ⚙️ 2. 系统渲染与交互逻辑
         // ==========================================
         
         const catalogList = document.getElementById('catalog-list');
@@ -388,14 +384,17 @@
             product.images.forEach(imgUrl => {
                 const slide = document.createElement('div');
                 slide.className = 'image-slide';
-                // 给图片绑定点击放大事件
                 slide.innerHTML = `<img src="${imgUrl}" alt="${product.title}" onclick="openLightbox(this.src)">`;
                 imageSlider.appendChild(slide);
             });
 
             // 切换商品时，恢复图片高度并回到页面顶部
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            imageContainer.style.height = '45vh';
+            if(window.innerWidth < 768) {
+                imageContainer.style.height = '45vh';
+            } else {
+                imageContainer.style.height = 'calc(100vh - 4rem)';
+            }
             imageSlider.scrollTo({ left: 0, behavior: 'auto' });
         }
 
@@ -406,16 +405,15 @@
         }
 
         // ==========================================
-        // 📜 3. 滑动滚动监听 (图片逐渐变小)
+        // 📜 3. 滑动滚动监听 (手机端图片逐渐变小)
         // ==========================================
         window.addEventListener('scroll', () => {
-            // 只在手机端(宽度<768)执行逐渐变小动画
+            // 仅在手机端生效
             if (window.innerWidth < 768) {
                 const scrollY = window.scrollY;
-                const maxH = window.innerHeight * 0.45; // 初始高度 45vh
-                const minH = 180; // 最小高度 180px
+                const maxH = window.innerHeight * 0.45; // 初始 45vh
+                const minH = 180; // 最小高度
                 
-                // 滚动 150px 内完成缩小动画
                 let newHeight = maxH - (scrollY * 1.5); 
                 
                 if (newHeight < minH) newHeight = minH;
@@ -423,10 +421,15 @@
 
                 imageContainer.style.height = `${newHeight}px`;
             } else {
-                // PC 端保持固定高度
+                // 电脑端强制保持全高
                 imageContainer.style.height = 'calc(100vh - 4rem)';
             }
         });
+
+        // 初始化时检查一次屏幕宽度，设置PC端高度
+        if(window.innerWidth >= 768) {
+            imageContainer.style.height = 'calc(100vh - 4rem)';
+        }
 
         // ==========================================
         // 🔍 4. 全屏放大预览
@@ -437,14 +440,14 @@
         function openLightbox(src) {
             lightboxImg.src = src;
             lightbox.classList.remove('hidden');
-            // 阻止背景滚动
+            lightbox.classList.add('flex'); // 确保居中
             document.body.style.overflow = 'hidden'; 
         }
 
         function closeLightbox() {
             lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
             lightboxImg.src = '';
-            // 恢复背景滚动
             document.body.style.overflow = 'auto';
         }
 
