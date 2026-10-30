@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品目录展示 | PC手机完美适配</title>
+    <title>产品目录展示</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -123,206 +123,224 @@
         // 📦 1. 商品数据
         // ==========================================
         const products = [
-             {
-                id: 1,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "<b>帮面材质：</b>头层牛皮+TPU+织物\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>橡皮粉：</b>35-41码\n<b>皓月白：</b>35-45码\n<b>暗夜黑：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>2万\n<b>补单时间：</b>7天"
-            },
-            {
-                id: 2,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            },
-             {
-                id: 3,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 4,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 5,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 6,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 7,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 8,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 9,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 10,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 11,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 12,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 13,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 14,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 15,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 16,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }, {
-                id: 17,
-                title: "0701",
-                category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
-                images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
-            },
-            {
-                id: 18,
-                title: "0702",
-                category: "运动鞋",
-                price: "¥ 259.00",
-                images: [
-                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
-                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
-                ],
-                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
-            }
+            [
+  {
+    id: 1,
+    title: "0701",
+    category: "休闲鞋",
+    price: "售价：139.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_c4cf396a28ef08f027a4fcc156af4b2e_sx_337506_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_bbde22bb0e3a81896c65b4b4f885066a_sx_184420_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_e31cb6080a3fd5b713ecbbd27ceae30b_sx_278640_www800-800"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+TPU+织物\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>橡皮粉：</b>35-41码\n<b>皓月白：</b>35-45码\n<b>暗夜黑：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>2万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 2,
+    title: "925",
+    category: "休闲鞋",
+    price: "售价：99.9元\n佣金：25%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_1163dbc4062e7558820313192ff87285_sx_655396_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_8311f3033541a6d2922b152078dda62a_sx_574706_www800-800"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+冰丝莱卡网布\n<b>鞋底：</b>MD软发泡+TPU防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>米白色：</b>35-45码\n<b>黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.6万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 3,
+    title: "0703",
+    category: "休闲鞋",
+    price: "售价：99.9元\n佣金：25%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_cf3e15420724dc18f3875be45fc48155_sx_1383148_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_3375199dba640eed1b17e3b736a54abb_sx_1289108_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_644692c69ff7ff2b7e105b1ac35798ce_sx_1416959_www1600-1600"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+TPU+织物\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>炫黑色：</b>35-45码\n<b>米白色：</b>35-45码\n<b>银灰色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.3万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 4,
+    title: "807",
+    category: "休闲鞋",
+    price: "售价：79.9元\n佣金：20%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_d541a431ef6ba49ba08f9d1de1a24ce4_sx_991684_www1200-1200",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_9a7230862709ac6f920b1e9a19656fc5_sx_837212_www1200-1200"
+    ],
+    desc: "<b>帮面材质：</b>头层猪巴+冰丝莱卡网\n<b>鞋底：</b>MD软发泡+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>雨雾白：</b>35-44码\n<b>木叶棕：</b>35-44码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.7万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 5,
+    title: "0702",
+    category: "休闲鞋",
+    price: "售价：139.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_27c15c2f69582017ea089075aad2517d_sx_1321820_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_e8a3488a8d09b467c4b52d65c91c8079_sx_1186847_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_397d7244229a4c12ac88e348c099df2a_sx_1224968_www1600-1600"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+TPU+织物\n<b>鞋底：</b>巴斯夫真爆大底+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>藕粉色：</b>35-41码\n<b>米杏色：</b>35-45码\n<b>炫黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>3万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 6,
+    title: "5133",
+    category: "休闲鞋",
+    price: "售价：29.9元（两双装）\n佣金：35%（不含运费险）\n佣金：23%（含运费险）",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_ba1fdfa3fe3ec19540f13d78a5cb18b8_sx_358516_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_a065dbe4cc1369e7649e77ceadc23f8b_sx_364846_www800-800"
+    ],
+    desc: "<b>材质：</b>运动缓震乳胶（PU）+硅胶网\n  \n<b>颜色尺码：</b>\n<b>灰色面：</b>35-46码\n<b>黑色面：</b>35-46码\n  \n<b>现货库存：</b>1.2万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 7,
+    title: "1202",
+    category: "休闲鞋",
+    price: "售价：79.9元\n佣金：20%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad3b64401346ef0e0a1ba6a0f2411e08_sx_964711_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_d0a42bde8bc437b32548d280169f891b_sx_827132_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_9b38f69f1bb845cb2b038f5c5a912696_sx_966363_www1600-1600"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+特材+织物\n<b>鞋底：</b>MD软发泡+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>黑/白色：</b>35-45码\n<b>米色：</b>35-45码\n<b>黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>1.7万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 8,
+    title: "903",
+    category: "休闲鞋",
+    price: "售价：99.9元\n佣金：25%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_c38f803b8d5bb77f23e27e0354e1e029_sx_935171_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ca43a3b80e2b38ecb2a347fbc529ee2a_sx_912697_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_f057e69931adb28caab7be70963dc09c_sx_977481_www1600-1600"
+    ],
+    desc: "<b>帮面材质：</b>防砂精编工程网（Gore-Tex面料）+梭织\n<b>鞋底：</b>橡胶防滑大底\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>米紫色：</b>36-40码\n<b>黑色：</b>36-45码\n<b>灰色：</b>36-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.3万\n<b>补单时间：</b>不补单"
+  },
+  {
+    id: 9,
+    title: "8826",
+    category: "休闲鞋",
+    price: "售价：99.9元\n佣金：25%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_d55e8148943a42c2bf873cc6f3950a00_sx_797736_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_c99594dea9005eea03963b72916000b3_sx_929447_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_115576996dc505608eb6fb0d42ad9831_sx_1018845_www1600-1600"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+网布\n<b>鞋底：</b>MD软发泡+TPR防滑贴片\n<b>鞋垫：</b>运动缓震硅胶鞋垫\n  \n<b>颜色尺码：</b>\n<b>浅米色：</b>35-45码\n<b>炫黑色：</b>35-45码\n<b>银灰色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.8万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 10,
+    title: "0801",
+    category: "休闲鞋",
+    price: "售价：139.9元\n佣金：35%\n99.9元，25%佣金",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_6d788f1960cd71199d418807e5f44423_sx_203449_www1000-1000",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_670a4494c9d9537c99c5801cc5e39446_sx_272491_www1000-1000"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+冰丝莱卡网布\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>乌拉草抗菌防臭鞋垫\n  \n<b>颜色尺码：</b>\n<b>黑色：</b>35-45码\n<b>米白色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>1.6万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 11,
+    title: "996",
+    category: "休闲鞋",
+    price: "售价：149.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_d486980b61b432a74a4c143d5be2b8cd_sx_400503_www1000-1000",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_66b57d615cd97666da9a89e242748847_sx_471334_www1000-1000"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+冰丝莱卡网布+TPU\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>抗菌防臭硅胶运动缓震鞋垫\n  \n<b>颜色尺码：</b>\n<b>炫黑色：</b>35-45码\n<b>米白色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>1.6万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 12,
+    title: "258",
+    category: "休闲鞋",
+    price: "售价：149.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_f90a838da2d4f5f4b9c612192a61cf07_sx_423391_www1200-972",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_489f7b7438669c2d643bc4e6730ba950_sx_356504_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_489f7b7438669c2d643bc4e6730ba950_sx_356504_www800-800"
+    ],
+    desc: "<b>帮面材质：</b>贾卡网布+TPU\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>抗菌防臭硅胶运动缓震鞋垫\n  \n<b>颜色尺码：</b>\n<b>米杏色：</b>35-41码\n<b>浅灰色：</b>35-45码\n<b>炫黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>1.7万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 13,
+    title: "911",
+    category: "休闲鞋",
+    price: "售价：149.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_d7edb6d4aed8750d9813ccd4b2982e91_sx_640021_www1600-1600",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_87a3129f5d792211e7621e55d87ce583_sx_646900_www1600-1600"
+    ],
+    desc: "<b>帮面材质：</b>贾卡透气网布\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>抗菌防臭硅胶运动缓震鞋垫\n  \n<b>颜色尺码：</b>\n<b>米白色：</b>35-45码\n<b>炫黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.9万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 14,
+    title: "8811",
+    category: "休闲鞋",
+    price: "售价：149.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2c8146af8145af2bff7aa50436116bc7_sx_1519008_www1254-1254",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_b3c22e2c126ae2751bee2ac20af17667_sx_255257_www1254-1254"
+    ],
+    desc: "<b>帮面材质：</b>TPU+双层贾卡网布\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>抗菌防臭硅胶运动缓震鞋垫\n  \n<b>颜色尺码：</b>\n<b>米白色：</b>35-45码\n<b>炫黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>0.9万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 15,
+    title: "0705",
+    category: "休闲鞋",
+    price: "售价：149.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_367445ecac8f078b505048392ae2e713_sx_1730876_www1254-1254",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_77a4c495480bac96e8dd5187f9a777a5_sx_2687588_www1254-1254"
+    ],
+    desc: "<b>帮面材质：</b>TPU+双层贾卡网布\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>抗菌防臭硅胶运动缓震鞋垫\n  \n<b>颜色尺码：</b>\n<b>米杏色：</b>35-45码\n<b>炫黑色：</b>35-45码\n<b>藕粉色：</b>35-41码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>1.2万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 16,
+    title: "172",
+    category: "休闲鞋",
+    price: "售价：149.9元\n佣金：35%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_7159aa6efe573a2bb88f447c6e920f19_sx_1940195_www1254-1254",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_0c4e4c79613ca8cfc8eba19ac53708fd_sx_1777418_www1254-1254"
+    ],
+    desc: "<b>帮面材质：</b>TPU+双层贾卡网布\n<b>鞋底：</b>巴斯夫真爆米花底+TPR防滑贴片\n<b>鞋垫：</b>抗菌防臭硅胶运动缓震鞋垫\n  \n<b>颜色尺码：</b>\n<b>米杏色：</b>35-45码\n<b>炫黑色：</b>35-45码\n  \n<b>运费险：</b>有\n<b>现货库存：</b>1.2万\n<b>补单时间：</b>7天"
+  },
+  {
+    id: 17,
+    title: "8822，386",
+    category: "休闲鞋",
+    price: "售价：59.9元\n佣金：20%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_dd42bca4f0230889bb02c1b52253eb26_sx_437399_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_e3c643faf25851c07354c8e55824f54b_sx_592459_www800-800"
+    ],
+    desc: "<b>帮面材质：</b>三防科技面\n<b>鞋底：</b>橡塑发泡\n<b>款式：</b>黑色单，黑色绒，米色单，米色绒\n  \n<b>颜色尺码：</b>\n<b>米色：</b>35-45码\n<b>黑色：</b>35-45码\n  \n<b>运费险：</b>无\n<b>现货库存：</b>1万\n<b>补单时间：</b>不补单"
+  },
+  {
+    id: 18,
+    title: "0778",
+    category: "休闲鞋",
+    price: "售价：49.9元\n佣金：10%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_e2dc0d34902e16fade1b446b665a3be4_sx_275130_www800-800",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_d41411905c9d2100db272e40ceeac14e_sx_294654_www800-800"
+    ],
+    desc: "<b>帮面材质：</b>头层牛皮+徕卡\n<b>鞋底：</b>爆米花+橡胶贴片\n<b>鞋垫：</b>头层猪皮\n  \n<b>颜色尺码：</b>\n<b>米黑色：</b>35-40码\n<b>米金色：</b>35-40码\n  \n<b>运费险：</b>无\n<b>现货库存：</b>110双\n<b>补单时间：</b>不补单"
+  },
+  {
+    id: 19,
+    title: "23056",
+    category: "休闲鞋",
+    price: "售价：49.9元\n佣金：10%",
+    images: [
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_82951239af27eab9472d021cff31ec1c_sx_424706_www1280-1279",
+      "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_26e4f19745efffe69756f494f90a2d31_sx_438066_www1286-1279"
+    ],
+    desc: "<b>帮面材质：</b>徕卡\n<b>鞋底：</b>橡胶发泡\n  \n<b>颜色尺码：</b>\n<b>银黑色：</b>35-40码\n<b>银粉色：</b>35-40码\n  \n<b>运费险：</b>无\n<b>现货库存：</b>400双\n<b>补单时间：</b>不补单"
+  }
+
         ];
 
         // ==========================================
