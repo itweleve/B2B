@@ -3,37 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品目录展示 | 多图滑动版</title>
+    <title>产品目录展示 | 原生滑动版</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Swiper 轮播图 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
+        /* 隐藏滚动条让界面更清爽 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 定制 Swiper 的样式，让滑动按钮好看一点 */
-        .swiper-button-next, .swiper-button-prev {
-            color: #2563eb; /* 蓝色 */
-            background: rgba(255, 255, 255, 0.8);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        /* 原生滑动容器，带有横向滚动吸附功能 */
+        .native-slider {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            /* 增加惯性滑动 */
+            -webkit-overflow-scrolling: touch; 
         }
-        .swiper-button-next:after, .swiper-button-prev:after {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .swiper-pagination-bullet-active {
-            background-color: #2563eb !important;
-        }
-        /* 确保图片居中且不变形 */
-        .swiper-slide {
+
+        /* 每一张图片的容器，强制占满100%宽度并居中吸附 */
+        .image-slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+        }
+
+        .image-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+            filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04));
         }
     </style>
 </head>
@@ -57,24 +63,23 @@
             </nav>
         </aside>
 
-        <!-- 中间：商品图片滑动区 (Swiper) -->
-        <main class="w-full md:w-1/2 bg-gray-50 flex items-center justify-center h-[45vh] md:h-auto shrink-0 border-b md:border-b-0 md:border-r border-gray-200 relative">
+        <!-- 中间：商品图片滑动区 -->
+        <!-- 手机端固定高度 h-[50vh]，PC端自适应 -->
+        <main class="w-full md:w-1/2 bg-gray-50 shrink-0 border-b md:border-b-0 md:border-r border-gray-200 relative h-[45vh] md:h-auto flex items-center justify-center">
             
-            <!-- Swiper 容器 -->
-            <div class="swiper mySwiper w-full h-full">
-                <div id="swiper-wrapper" class="swiper-wrapper">
-                    <!-- JS 会动态把商品图片塞进这里 -->
-                </div>
-                <!-- 左右箭头和底部小圆点 -->
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+            <!-- 原生滑动容器 -->
+            <div id="image-slider" class="native-slider w-full h-full no-scrollbar">
+                <!-- JS 会动态把商品图片塞进这里 -->
             </div>
 
+            <!-- PC端左右按钮（手机端因为可以直接滑，所以隐藏） -->
+            <button onclick="scrollLeftImage()" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 w-10 h-10 rounded-full items-center justify-center shadow-md hover:bg-white text-blue-600 z-10 border border-gray-200 focus:outline-none">←</button>
+            <button onclick="scrollRightImage()" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 w-10 h-10 rounded-full items-center justify-center shadow-md hover:bg-white text-blue-600 z-10 border border-gray-200 focus:outline-none">→</button>
+            
         </main>
 
         <!-- 右侧：商品介绍文字 -->
-        <section class="w-full md:w-auto flex-1 p-8 overflow-y-auto">
+        <section class="w-full md:w-auto flex-1 p-6 md:p-8 overflow-y-auto">
             <div class="max-w-2xl">
                 <span id="product-category" class="text-sm font-semibold text-blue-600 tracking-wider uppercase mb-2 block">产品分类</span>
                 <h1 id="product-title" class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 transition-opacity duration-300">商品名称</h1>
@@ -82,62 +87,55 @@
                 
                 <h3 class="text-lg font-bold text-gray-800 mb-2">产品说明</h3>
                 <p id="product-desc" class="text-gray-600 leading-relaxed mb-8 whitespace-pre-line transition-opacity duration-300">这里是介绍文字...</p>
-
-            
             </div>
         </section>
 
     </div>
 
-    <!-- 引入 Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
     <script>
         // ==========================================
-        // 📦 1. 在这里修改你的商品数据
+        // 📦 1. 商品数据
         // ==========================================
-        // ⚠️ 注意：images 现在是一个数组 [ ]，里面可以放多张图片的链接。
-        // 用英文逗号隔开，每一行放一个网址。
         const products = [
             {
-                 id: 1,
+                id: 1,
                 title: "0701",
                 category: "休闲鞋",
-                price: "售价：139.9元\n佣金：35%",
+                price: "¥ 299.00",
                 images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_2faa1644926c1c679d7f3987a753e21f_sx_182172_www500-500", 
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_ad64f8b602f25f0347f9bac9b09e35d3_sx_140523_www500-500",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_21b10f2221cd60431726d16ed5dea5dc_sx_173428_www500-500"
-                     ],
-                desc: "帮面材质：头层牛皮+TPU+织物\n鞋底：巴斯夫真爆米花底+TPR防滑贴片\n鞋垫：运动缓震硅胶鞋垫\n  \n颜色尺码：\n橡皮粉：35-41码\n皓月白：35-45码\n暗夜黑：35-45码\n  \n运费险：有\n现货库存：2万\n补单时间：7天"
+                    "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80", 
+                    "https://images.unsplash.com/photo-1546938576-6e6a64f317cc?w=800&q=80",
+                    "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&q=80"
+                ],
+                desc: "0701男女同款休闲鞋\n帮面材质：头层牛皮\n内里材质：织物\n鞋底材质：巴斯夫爆米花底+TPU防滑贴片"
             },
             {
                 id: 2,
-                title: "0701",
-                category: "休闲鞋",
-                price: "¥ 199.00",
+                title: "0702",
+                category: "运动鞋",
+                price: "¥ 259.00",
                 images: [
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_1b1c40d5f07fc7cb82db428fae3a70d6_sx_3530971_www2048-2048",
-                    "https://p3-aio.ecombdimg.com/obj/ecom-shop-material/png_m_b3329f83cb82ab7a5dea5bc28180ba40_sx_3387443_www2048-2048"
+                    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80",
+                    "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=800&q=80"
                 ],
-                desc: "全天候心率监测与血氧检测。\n支持20种运动模式，5ATM防水。\n超长续航，一次充电可用14天。"
+                desc: "轻量化设计，网面透气。\n适合日常慢跑与休闲穿搭。"
             },
             {
                 id: 3,
                 title: "8811",
-                category: "新款",
+                category: "户外鞋",
                 price: "¥ 459.00",
                 images: [
                     "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80",
                     "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80"
                 ],
-                desc: "无需插电，手动按压萃取。\n兼容胶囊与咖啡粉，随时随地享受意式浓缩。\n食品级材质，小巧轻便易携带。"
+                desc: "防滑耐磨大底，适应各种复杂地形。\n防水鞋面，保持双脚干爽。"
             }
-            // 继续往下复制花括号 {} 添加更多商品，直到 20 个...
+            // 继续添加更多产品...
         ];
 
         // ==========================================
-        // ⚙️ 2. 系统渲染逻辑 (不需要修改)
+        // ⚙️ 2. 系统渲染逻辑 (无需修改)
         // ==========================================
         
         const catalogList = document.getElementById('catalog-list');
@@ -145,26 +143,9 @@
         const productPrice = document.getElementById('product-price');
         const productCategory = document.getElementById('product-category');
         const productDesc = document.getElementById('product-desc');
-        const swiperWrapper = document.getElementById('swiper-wrapper');
+        const imageSlider = document.getElementById('image-slider');
 
-        let swiperInstance = null; // 存放滑动组件的实例
-
-        // 初始化 Swiper
-        function initSwiper() {
-            swiperInstance = new Swiper(".mySwiper", {
-                loop: false,
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-            });
-        }
-
-        // 生成左侧目录
+        // 初始化左侧目录
         function initCatalog() {
             products.forEach((product, index) => {
                 const btn = document.createElement('button');
@@ -177,7 +158,6 @@
             
             if(products.length > 0) {
                 loadProduct(0);
-                initSwiper(); // 首次初始化轮播图
             }
         }
 
@@ -195,7 +175,7 @@
                 }
             });
 
-            // 2. 更新右侧文字（加一点淡出淡入效果）
+            // 2. 更新右侧文字
             productTitle.style.opacity = 0;
             productDesc.style.opacity = 0;
             setTimeout(() => {
@@ -207,23 +187,29 @@
                 productDesc.style.opacity = 1;
             }, 200);
 
-            // 3. 更新中间轮播图图片
-            // 清空旧图片
-            swiperWrapper.innerHTML = '';
+            // 3. 更新中间图片
+            imageSlider.innerHTML = '';
             
-            // 遍历当前商品的 images 数组，生成新的 slide
             product.images.forEach(imgUrl => {
                 const slide = document.createElement('div');
-                slide.className = 'swiper-slide';
-                slide.innerHTML = `<img src="${imgUrl}" alt="${product.title}" class="max-w-full max-h-full object-contain drop-shadow-lg rounded-lg">`;
-                swiperWrapper.appendChild(slide);
+                slide.className = 'image-slide'; // 使用 CSS 定义的样式
+                slide.innerHTML = `<img src="${imgUrl}" alt="${product.title}">`;
+                imageSlider.appendChild(slide);
             });
 
-            // 4. 通知 Swiper 更新数据并回到第一张
-            if (swiperInstance) {
-                swiperInstance.update(); // 刷新组件
-                swiperInstance.slideTo(0); // 回到第一张
-            }
+            // 4. 每次切换商品，图片滚动回第一张
+            imageSlider.scrollTo({ left: 0, behavior: 'auto' });
+        }
+
+        // PC端左右滑动按钮的逻辑
+        function scrollLeftImage() {
+            const width = imageSlider.clientWidth;
+            imageSlider.scrollBy({ left: -width, behavior: 'smooth' });
+        }
+
+        function scrollRightImage() {
+            const width = imageSlider.clientWidth;
+            imageSlider.scrollBy({ left: width, behavior: 'smooth' });
         }
 
         // 启动
