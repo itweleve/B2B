@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>报告详情</title>
+<style>
+  :root {
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    --text-muted: #888888;
+    --border-color: #eeeeee;
+    --blue: #1677ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Microsoft YaHei", "PingFang SC", sans-serif;
+    padding: 24px 16px;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* 通用的卡片容器样式（用于图片和内容） */
+  .card-box {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  
+  /* 图片自适应 */
+  .card-box img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* 底部图片去掉多余的外边距 */
+  .footer-box {
+    margin-bottom: 0;
+  }
+
+  /* 报告详情卡片内边距 */
+  .content-card {
+    padding: 24px 32px 32px;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #222;
+  }
+  
+  /* 绿色对勾图标 */
+  .check-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* 表格样式（还原截图细边框效果） */
+  .report-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .report-table th,
+  .report-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .report-table tr:last-child th,
+  .report-table tr:last-child td {
+    border-bottom: none;
+  }
+  .report-table th {
+    width: 120px;
+    background-color: #fafbfc;
+    color: var(--text-muted);
+    font-weight: normal;
+    white-space: nowrap;
+  }
+  .report-table td {
+    color: #444;
+    background-color: #fff;
+  }
+  .report-table td p {
+    margin: 0 0 8px;
+  }
+  .report-table td p:last-child {
+    margin-bottom: 0;
+  }
+  .link { color: var(--blue); text-decoration: none; }
+
+  /* 移动端响应式适配 */
+  @media (max-width: 768px) {
+    body { padding: 12px; }
+    .content-card { padding: 16px; }
+    .report-table th { width: 90px; padding: 12px; }
+    .report-table th, .report-table td { font-size: 13px; line-height: 1.6; padding: 12px; }
+  }
+  
+  /* 打印适配 */
+  @media print {
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; background: #fff; padding: 0; }
+    .container { max-width: none; }
+    .card-box { box-shadow: none; border: 1px solid #eee; }
+    .report-table tr { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 1. 顶部图片（TTS Logo） -->
+  <div class="card-box">
+    <img
+      src="https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_5249285437d31ea710cd33e3fb7985f2_sx_86752_www2400-400"
+      alt="天纺标检测认证股份有限公司"
+      referrerpolicy="no-referrer">
+  </div>
+
+  <!-- 2. 中间详情主体 -->
+  <div class="card-box content-card">
+    <div class="card-header">
+      <h1 class="card-title">报告详情</h1>
+      <!-- 纯代码绘制的绿色对勾 SVG -->
+      <svg class="check-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="12" fill="#10b981"/>
+        <path d="M7 12.5L10.5 16L17 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <table class="report-table">
+      <tbody>
+        <tr>
+          <th>实验室</th>
+          <td>天纺标检测认证股份有限公司</td>
+        </tr>
+        <tr>
+          <th>委托单位</th>
+          <td><a class="link" href="#">香港赛诺品牌管理股份有限公司</a></td>
+        </tr>
+        <tr>
+          <th>样品名称</th>
+          <td>平底袜子</td>
+        </tr>
+        <tr>
+          <th>货号</th>
+          <td>-</td>
+        </tr>
+        <tr>
+          <th>~{备注}Remarks~</th>
+          <td>
+            <p>何振宇领域：微生物检测项目；单学蕾签字领域：除微生物检测项目以外的全部检测项目。</p>
+            <p>Signature Field of He Zhen: Microbe test item; Signature Field of Shan Xuelei: All test items except for Microbe test item.</p>
+            <p>TTTS-WT25605097、TTTS-WT25605097/1为同一次送检同一批样品出具的两份检测报告，客户要求TTTS-WT25605097、TTTS-WT25605097/1报告合并为本报告。</p>
+            <p>The tested samples in reports TTTS-WT25605097、TTTS-WT25605097/1 were submitted at the same time and used in the same style. And the client requests the captioned reports to be combined into this report.</p>
+          </td>
+        </tr>
+        <tr>
+          <th>检测标准</th>
+          <td>
+            <p>GB/T 33610.1-2019 纺织品 消臭性能的测定 第1部分：通则</p>
+            <p>Textiles — Determination Of Deodorant Property — Part 1:General Principle</p>
+            <p>T/TTGA 007-2024 抗菌纺织品 Antibacterial textiles (AAAAAAAAAA)</p>
+            <p>GB 18401-2010 国家纺织产品基本安全技术规范</p>
+            <p>National General Safety Technical Code for Textile Products(B类 Class B)</p>
+            <p>FZ/T 73001-2016 袜子 Hosiery(一等品 Grade I)</p>
+          </td>
+        </tr>
+        <tr>
+          <th>检测项目</th>
+          <td>pH值,甲醛含量,抗菌性能（AAAAAAAAAA）,可分解致癌芳香胺染料,耐汗渍色牢度,耐摩擦色牢度,耐水色牢度,耐皂洗色牢度,纤维含量,消臭性能</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. 底部图片（400电话） -->
+  <div class="card-box footer-box">
+    <img
+      src="https://p3-aio.ecombdimg.com/obj/ecom-shop-material/jpeg_m_285c07a8493c083b8aa604d4d7164f46_sx_21368_www2400-160"
+      alt="热线电话 4000871753"
+      referrerpolicy="no-referrer">
+  </div>
+
+</div>
+</body>
+</html>
