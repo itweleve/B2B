@@ -1,0 +1,121 @@
+.layui-table-body .layui-btn-normal{background:rgb(255, 255, 255,0);color: #3094e0;}
+.layui-table-body .layui-btn-danger{background:rgb(255, 255, 255,0);color: red;}
+.layui-table-body .layui-btn-warm{background:rgb(255, 255, 255,0);color: #FFB800;}
+.layui-table-body .layui-btn-disabled{background:rgb(255, 255, 255,0);color: #C9C9C9;}
+.button-select-ul{
+    background-color: #3094e0 !important;
+    height: 28px;
+    padding:0px 0px;
+     line-height:28px; 
+    font-size: 12px;
+     border-radius: 3px;
+}
+.button-select-li {
+    background-color: #3094e0 !important;
+    height: 28px;
+    line-height:28px !important;
+    border-radius: 3px;
+}
+
+.button-select-a{
+    font-size: 12px;
+    background-color: #3094e0 !important;
+    color: #fff !important;
+    padding-left:8px !important;
+    border-radius: 3px;
+}
+
+/*浠ヤ笅涓や釜鏍峰紡閽堝鎸夐挳涓嬫媺妗�,璇︽儏鍙涓氬姟鍙楃悊鑺傜偣*/
+.layui-nav-child{
+    top: 42px;
+}
+/*鐢ㄤ簬璁剧疆鎸夐挳涓嬫媺閫夋嫨鐨勮儗鏅壊,濡傛崲鍏朵粬棰滆壊,鍗曠嫭鐨刪tml椤甸潰鑷繁璁剧疆鍗冲彲*/
+.layui-nav-bar{
+    background-color: #3094e0;
+    border-radius: 3px;
+}
+
+.layui-table-page {
+    text-align: right;
+}
+
+.layui-table > thead > tr > th {
+    font-weight: bold;
+}
+.layui-table { color: #252525; }
+.common-sm{font-size:20px; color:#56BC4E;display: inline-table;vertical-align: middle; margin-left: 10px;}
+.posContent{padding: 5px;
+    position: absolute;
+    border: 1px solid #ccc;
+    z-index: 99999999999;
+    background: #ffffff;
+    font-size: 14px;
+    opacity: 50;
+    -webkit-box-shadow: 1px 7px 33px -9px #969696;
+    box-shadow: 1px 7px 33px -9px #969696;
+    border: 1px solid #56bc4e8c;
+    border-radius: 5px;
+    right:15px;
+    color: dimgrey;  display:none;}
+    .title{text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 7px 0px;
+    color: black;
+    
+    border-bottom: 1px solid #ccc;
+  }
+     .content{padding:8px;}
+     .layui-icon-about:hover .posContent{
+     display:block;
+     }
+
+     /*置灰样式调整*/
+    .layui-disabled{
+        color: #c0c4cc!important;
+    }
+    .layui-disabled:hover {
+        color: #c0c4cc!important;
+    }
+
+    .layui-layer-title {
+        padding: 0px !important;
+    }
+
+    .mr_container{
+        padding-top: 0px ;
+    }
+
+    /**
+    table行mouseover样式
+     */
+    .onMouseoverCss {
+        background-color: #e8f1f8 !important;
+    }
+
+    /**
+    table行mouseover样式
+     */
+    .onSjdChoosedCss {
+        background-color: #87CEEB !important;
+    }
+
+    /*质检-表格加急样式*/
+    .onSjdSfjjChoosedCss {
+        background-color: #ceffce !important;
+    }
+
+.layui-table-edit-blur{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    padding:0 14px 1px;
+    border-radius:0;
+    box-shadow:1px 1px 20px rgba(0,0,0,.15)
+}
+
+.layui-table-cell{
+    min-height: 23px;
+}

@@ -1,0 +1,2798 @@
+//质检公用的方法
+
+//窗口额外高度,用来减去空白
+var windowExtraHeight=45;
+
+let londingLayer = null ;
+
+let defaultSpace = "　";
+
+var standardValueData = [] ;
+
+let testWayValueData = {} ;
+
+let userPdlx = getUserPdlx() ;
+
+let userBtnPower = localStorage.getItem("btnPower");
+let startChecked; //开始选择的位置
+let boxArr ;//checkbox数组
+// 监听鼠标位置
+var widths=0;
+//是否需要大小项关联
+let largeRelSmall;
+
+var isZytlgc=0    //判断是否是在左右拖拉的过程
+
+/**
+ * 时间格式化
+ * @param val 日期
+ * @param pattern 转化日期的类型
+ * @returns {null}
+ */
+function formatDate(val,pattern){
+    if (val != null && val != "") {
+        var date = new Date(val);
+        return date.format(pattern);
+    } else {
+        return null;
+    }
+}
+
+/**
+ * 获取指定n天前的时间
+ * @param val 往前查询天数
+ * @param pattern 转化日期的类型
+ * @returns {null}
+ */
+function formatDate4NDays(days,pattern){
+    if (isNaN(days)) {
+        return null;
+    } else {
+        var date = new Date(new Date().getTime()-(days * 3600 * 24 * 1000));
+        return date.format(pattern);
+    }
+}
+
+/**
+ * 判断是否为"","undefined",null,undefined
+ * @param str
+ * @returns {boolean}
+ */
+function judgeStr(str){
+    if(str == "" ||  str == undefined|| str == "undefined"){
+        return false;
+    }
+    return true;
+}
+
+
+/**
+ * 判断是否为"","undefined",null,undefined
+ * @param str
+ * @returns ""
+ */
+function judgeNull(str){
+    if(str == "" || str == undefined|| str == "undefined"){
+        return "";
+    }
+    return str;
+}
+
+/**
+ * 初始化查询获取配置文件
+ * @param config 数组方式传递(需要查询的配置文件),
+ */
+function queryConfig(config) {
+    //存放本地存储没有的配置文件名称
+    var configNameTemp = [];
+    //查询本地存储没有的配置文件
+    for(var i=0;i<config.length;i++){
+        if(window.localStorage[config[i]] == null){
+            configNameTemp[i]=config[i];
+        }
+    }
+    if(configNameTemp.length>0) {
+        //加载本地存储没有的配置文件
+        $_PostSync("/qc/findParams/" + configNameTemp.join('$'),{},function (res) {
+            for(var i=0;i<configNameTemp.length;i++){
+                //存放查询出来的配置文件（包含默认值,集合值）
+                // var json={};
+                //取字典服务的默认值
+                // json.value=res[configNameTemp[i]]["value"];
+                //取字典服务的配置集合值
+                // json.list= JSON.stringify(res[configNameTemp[i]]["list"]);
+                if(res[configNameTemp[i]] != null){
+                    window.localStorage[configNameTemp[i]]=JSON.stringify(res[configNameTemp[i]]);
+                }
+            }
+        });
+    }
+}
+
+
+/**
+ * 获取配置文件
+ * @param configName 数据字典名称
+ */
+function getConfig(configName) {
+    if(window.localStorage[configName] == null ){
+        $_PostSync("/qc/findParam/"+configName, {}, function (res) {
+            window.localStorage[configName]=JSON.stringify(res);
+        });
+    }
+
+    return window.localStorage[configName] != null ? $.parseJSON( window.localStorage[configName] ) : {}
+}
+
+
+
+/**获取当前时间
+ *type 0:年-月-日 1:xx年xx月xx日xx时xx分xx秒
+ */
+/*function getNowTime(type)
+{
+    var nowTime = new Date();
+    var nowYear=nowTime.getFullYear();
+    var nowMonth=timeAdd0(nowTime.getMonth() + 1);
+    var nowDay=timeAdd0(nowTime.getDate());
+    if(type=="1"){
+        var nowHours=timeAdd0(nowTime.getHours());
+        var nowMin=timeAdd0(nowTime.getMinutes());
+        var nowSeconds=timeAdd0(nowTime.getSeconds());
+        return nowYear + "年" + nowMonth+ "月" +  nowDay + "日"  + " " + nowHours + ":" + nowMin + ":" + nowSeconds;
+    }else {
+        return nowYear + "-" + nowMonth+ "-" +  nowDay  ;
+    }
+}*/
+
+/**
+ * 时间不满10,前面补0
+ * @param str
+ * @returns {*}
+ */
+/*
+function timeAdd0(str) {
+    if(Number(str)<=9){
+        str='0'+str;
+    }
+    return str;
+}*/
+
+/**
+ * 通过 location.search 获取get参数
+ */
+function getUrlParams() {
+    //返回一个json格式的对象
+    let urlParamObj = {};
+    let ulParams = location.search.substr(1) ;
+    //将各个参数截取出来
+    let urlParamArr = ulParams.split("&") ;
+    for(let i=0;i<urlParamArr.length;i++){
+        let tempParam = urlParamArr[i].split("=") ;
+        urlParamObj[tempParam[0]] = tempParam[1] ;
+    }
+    return urlParamObj ;
+}
+
+//时间转换函数
+function showTime(tempDate)
+{
+    console.log(tempDate)
+    var d = new Date(tempDate);
+    var year = d.getFullYear();
+    var month = d.getMonth();
+    month++;
+    var day = d.getDate();
+    var hours = d.getHours();
+
+    var minutes = d.getMinutes();
+    var seconds = d.getSeconds();
+    month = month<10 ? "0"+month:month;
+    day = day<10 ? "0"+day:day;
+    hours = hours<10 ? "0"+hours:hours;
+    minutes = minutes<10 ? "0"+minutes:minutes;
+    seconds = seconds<10 ? "0"+seconds:seconds;
+
+
+    var time = year+"-"+month+"-"+day;
+    // var time = year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
+    return time;
+}
+
+/**
+ * 获得当前window对象高度
+ */
+function getWindowHetght(){
+    return $(window).height();
+}
+
+/**
+ * 获得当前window对象宽度
+ */
+function getWindowWidth(){
+    return $(window).width();
+}
+function getTopWindowHetght(){
+    return top.$(window).height();
+}
+
+/**
+ * 获得当前window对象宽度
+ */
+function getTopWindowWidth(){
+    return top.$(window).width();
+}
+
+/**
+ *计算页面的实际高度
+ */
+function calcPageHeight() {
+    var cHeight = Math.max(document.body.clientHeight, document.documentElement.clientHeight);
+    var sHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    return Math.max(cHeight, sHeight);
+}
+/**
+ *计算页面的实际高度
+ */
+function calcTopPageHeight() {
+    var cHeight = Math.max(top.document.body.clientHeight, top.document.documentElement.clientHeight);
+    var sHeight = Math.max(top.document.body.scrollHeight, top.document.documentElement.scrollHeight);
+    return Math.max(cHeight, sHeight);
+}
+
+/**
+ * 获得最顶层公共的njmindTools
+ * @returns {Object}
+ */
+function getNjmindTools() {
+    if(!top.njmindTools){
+        top.njmindTools = new Object();
+    }
+    return top.njmindTools ;
+}
+
+
+/**
+ * 获取当前iframe页面的 document
+ * @returns {Object}
+ */
+function getIframeDocument() {
+
+    let nowDocument = top.document.getElementById(top.$routerNow.name) ;
+    return nowDocument ;
+}
+
+/**
+ * 获取当前iframe页面的 njmindTools
+ * @returns {Object}
+ */
+function getIframeNjmindTools() {
+
+    let nowWindow = getIframeDocument().contentWindow ;
+
+    if(!nowWindow.njmindTools){
+        nowWindow.njmindTools = new Object();
+    }
+    return nowWindow.njmindTools ;
+}
+
+
+
+/**
+ * 初始化单向判定下拉框
+ * @returns {string}
+ */
+function initDxpd(d) {
+    let str = "";
+    str = "<span style=\"position:relative;width: 110px;\">\n" +
+        "                    <span style=\"width:18px;overflow:hidden;\">\n" +
+        "                        <select name='dxjlSel' lay-ignore style=\"margin-left:-100px;width:100%;padding: 0px;width: 100%;\n" +
+        "                           padding: 1px 0;\n" +
+        "                           border: 1px solid #ddd;\n" +
+        "                           color: #3F3F3F;\n" +
+        "                           margin: 0;\n" +
+        "                           height:26px !important;\" class=\"wtdForm\"\n" +
+        "                                onchange=\"this.parentNode.nextSibling.nextElementSibling.value=this.value;try {$(this.parentNode.nextSibling.nextElementSibling).change()}catch (e){console.log(e)}\"\n" +
+        "                                onclick=\"this.options.selectedIndex = -1\">\n" +
+        "                            <option value=\"合格\">合格</option>\n" +
+        "                            <option value=\"不合格\">不合格</option>\n" +
+        "                        </select>\n" +
+        "                    </span>\n" +
+        "                    <input class=\"layui-input\" layIndex='"+d.LAY_INDEX+"' layTableIndex='"+d.LAY_TABLE_INDEX+"' sjdItemId='"+d.id+"' type=\"text\" name=\"dxjl\" class=\"wtdForm\" value=\"\" style=\"width:80%;position:absolute;left:0px;display:-webkit-inline-box\">\n" +
+        "                </span>"
+    return str ;
+}
+
+/**
+ * 初始化检测方法下拉框
+ * @returns {string}
+ */
+function initTestWay(d) {
+    let test_way = d.test_way ;
+    test_way = test_way.split("%#~")[1] ;
+    test_way = test_way.split("~#%");
+    let opt = "" ;
+    for(let i=0;i<test_way.length;i++){
+        opt += "<option value=\""+test_way[i]+"\">"+test_way[i]+"</option>"
+    }
+    let str = "";
+    str = "<span style=\"position:relative;width: 180px;\">\n" +
+        "                    <span style=\"width:18px;overflow:hidden;\">\n" +
+        "                        <select lay-ignore style=\"margin-left:-100px;width:100%;padding: 0px;width: 100%;\n" +
+        "                           padding: 1px 0;\n" +
+        "                           border: 1px solid #ddd;\n" +
+        "                           color: #3F3F3F;\n" +
+        "                           margin: 0;\n" +
+        "                           height:26px !important;\" class=\"wtdForm\"\n" +
+        "                                onchange=\"this.parentNode.nextSibling.nextElementSibling.value=this.value\"\n" +
+        "                                onclick=\"this.options.selectedIndex = -1\">\n" +
+        opt +
+        "                        </select>\n" +
+        "                    </span>\n" +
+        "                    <input class=\"layui-input\" type=\"text\" name=\"test_way\" autocomplete=\"off\" class=\"wtdForm\" value=\"\" style=\"width:90%;position:absolute;left:0px;display:-webkit-inline-box\">\n" +
+        "                </span><input type='hidden' name='options' value='"+d.test_way.split("%#~")[1]+"'>"
+    return str ;
+}
+
+
+
+/**
+ * 注册监听事件
+ * @param eventName 事件名称
+ * @param callBackFunction 回调方法
+ * @param useCapture 可选。布尔值，指定事件是否在捕获或冒泡阶段执行。
+ */
+function registereEventListener(eventName,callBackFunction,useCapture) {
+    window.addEventListener(eventName,callBackFunction,useCapture);
+}
+
+
+//注册页签切换用到的对象
+window.globalEvents = {
+    _this:this,
+    _destroyed(that){
+        console.log("_destroyed")
+        if(typeof destroyedFunction == "function"){
+            destroyedFunction();
+        }
+
+    },
+    _activated(that){
+        console.log("_activated")
+        if(typeof activatedFunction == "function"){
+            activatedFunction();
+        }
+    },
+    _deactivated(that){
+        console.log("_deactivated")
+        if(typeof deactivatedFunction == "function"){
+            deactivatedFunction();
+        }
+    }
+}
+
+/**
+ * 跳转流程查询公共页面
+ * @param sjdId 送检单id
+ * @param opFlag 1非弹窗跳转  2弹窗跳转
+ */
+function jumpToCommonProcedurePage(sjdId,endCallBack) {
+    let paramObj = {
+        area: ['85%', '90%'],
+        // title: ['流程状态详情','font-size:17px;text-align:center;font-weight:1000'],
+        closeBtn: 0,
+        zIndex:999999999,
+        content: "/qc/resources/views/business/zjCommonProcedureInfoPage.html?sjdId="+sjdId, //路径
+    }
+    if(!!endCallBack){
+        paramObj.end = endCallBack
+    }
+    showCommonLayer(paramObj,"","","","1");
+}
+
+/**
+ * 跳转至处理页面 step_path_id跳转对应页面的菜单ID
+ * @param step_path_id 跳转页面
+ * @param step_jump_path 3级目录跳转的页面
+ */
+function toJump(step_path_id,step_jump_path) {
+    if (step_path_id == "" || step_path_id == null) {
+        return;
+    }
+    //根据菜单权限，判断是否有节点任务处理权限，从而判断是否能跳转处理页面
+    var menu = localStorage.getItem('userMenus');
+    if (menu.indexOf("@"+step_path_id+"@") == -1) {
+        return;
+    }
+    var oldTopUrl = top.location.href;//top的url路径
+    var newTopUrl;
+    if(step_jump_path){
+        newTopUrl= oldTopUrl.split('#/admin/')[0]+"#/admin/"+step_jump_path;//截取后拼接需要跳转的top的url路径
+        //调用容器中的跳转url方法
+        jumpToChromeUrl(newTopUrl);
+    }else {
+        newTopUrl= oldTopUrl.split('#/admin/')[0]+"#/admin/"+step_path_id;//截取后拼接需要跳转的top的url路径
+        jumpToChromeUrl(newTopUrl);
+        //先得到当前父层的iframe索引
+        var index = parent.layer.getFrameIndex(window.name);
+        //再执行关闭
+        parent.layer.close(index);
+    }
+}
+
+/**
+ * 数组内元素去重
+ * @param array
+ * @returns {Array}
+ */
+function unique(array){
+    var temp = [];
+    var l = array.length;
+    for(var i = 0; i < l; i++) {
+        for(var j = i + 1; j < l; j++){
+            if (array[i] === array[j]){
+                j = ++i;
+            }
+        }
+        temp.push(array[i]);
+    }
+    return temp;
+}
+
+/**
+ * 打开遮罩层
+ * @param showContant
+ */
+function showLondingLayer(showContant) {
+    londingLayer = layer.load(0, {
+        content: "<span style='color: #0d8ddb;font-size: 16px;'><i class=\"layui-icon layui-icon-loading-1 layui-icon layui-anim layui-anim-rotate layui-anim-loop\"></i>"+showContant+"</span>",
+        shade: [0.5, 'gray'], //0.5透明度的灰色背景
+        success: function (layero) {
+            layero.find('.layui-layer-content').css({
+                'paddingTop': '40px',
+                'width': '200px',
+                'textAlign': 'center',
+                'background-position-x': '40%',
+                'background':'none',
+            });
+        }
+    });
+    console.log("打开........"+londingLayer) ;
+}
+
+/**
+ * 关闭遮罩层
+ * @param showContant
+ */
+function closeLondingLayer() {
+    console.log("关闭........"+londingLayer) ;
+    if(londingLayer){
+        layer.close(londingLayer);
+        londingLayer = null ;
+    }
+}
+
+/**
+ * 项目检验对比技术要求、实测值
+ */
+function dxpd_simple_slt1(jsyqVal,sczArr,index,zxzName){
+    let pdRes = 2;  //总判定 1合格0不合格2不变
+
+
+    if(jsyqVal == null || sczArr == null){
+        return pdRes ;
+    }
+    let jsyqValTemp = $.trim(jsyqVal);//技术要求的内容
+    for(let i=0;i<sczArr.length;i++){
+        let pdResTemp = 2; //当次判定 1合格0不合格  2默认不变
+        let sczVal = sczArr[i];
+        if(!sczVal){
+            continue ;
+        }
+        if(sczVal.indexOf("不符合")!=-1 || sczVal.indexOf("不合格")!=-1){//如填写不符合、不合格直接判定不合格
+            return 0 ;
+        }
+        if(jsyqValTemp == sczVal){//值相等则返回
+            pdResTemp = 1;
+        }else if(sczVal.indexOf("符合")!=-1 || sczVal == "未检出"
+            || sczVal.indexOf("合格")!=-1){
+		pdResTemp = 1 ;
+        }else {
+            let input_value = sczVal; //依次取每个值
+            let mynum = $.trim(input_value);
+            jsyqValTemp = jsyqValTemp.replace(/&gt;/g,">").replace(/&lt;/g,"<");
+            mynum = mynum.replace(/&gt;/g,">").replace(/&lt;/g,"<");
+
+            let input_vlaueArr = input_value.split(",");
+            let jsyqValTempArr = jsyqValTemp.split(",");
+            if(input_vlaueArr.length==1){
+                input_vlaueArr = input_value.split("，");
+            }
+            if(jsyqValTempArr.length==1){
+                jsyqValTempArr = jsyqValTemp.split("，");
+            }
+            if(pdResTemp==2){ //如果未判定结果则进入公共判定
+                if(input_value !='' && !isNaN(mynum)){
+                    let fuhao = jsyqValTemp.substr(0,1);//取第一个符号
+                    let fuhao2 = jsyqValTemp.substr(0,2);//取前二个符号
+                    pdResTemp = judgeSczQualified(mynum,jsyqValTemp,fuhao,fuhao2);
+                }else {
+                    //若实测值填写的文本与数据匹配是否有维护的合格、不合格
+                    $_PostSync("/qc/findParam/autoJudge", {}, function (res) {
+                        var data = res.list;
+                        let isQualified = true;//默认为合格
+                        for (var i = 0; i < data.length; i++) {
+                            if (sczArr == data[i].remark) {
+                                if (data[i].code.indexOf("不") != -1) {//包含'不'字则不合格
+                                    isQualified = false;
+                                    break;
+                                }
+                            }
+                        }
+                        //当次判定 2不变1合格0不合格
+                        if (isQualified) {
+                            pdResTemp = 2;
+                        } else {
+                            pdResTemp = 0;
+                        }
+                    });
+                }
+            }
+        }
+        if(pdResTemp==0){
+            pdRes = 0;
+        }else if(pdResTemp==1 && pdRes ==2){
+            pdRes = 1;
+        }
+    }
+    return pdRes ;
+}
+
+/**
+ * 针对实测值、技术要求带横杠的修改 例如：3-4（相当于3.5）
+ * @param mynum 实测值
+ * @param jsyqValTemp 技术要求
+ */
+function specialjudgeSczQualified(mynum,jsyqValTemp) {
+    var pdResTemp = 2;
+    let mynumArr   = mynum.split("-");//实测值内容
+    let jsyqValArr;
+    let fuhao = jsyqValTemp.substr(0,1);//取第一个符号
+    let fuhaoObj = {
+        "≥":">=",">=":">=", "≧":">=","＞＝":">=",
+        "＞":">",">":">",
+        "≤":"<=","<=":"<=", "≦":"<=","＜＝":"<=",
+        "＜":"<","<":"<",
+    };
+    let yaoqiuzhi = jsyqValTemp.substr(1,jsyqValTemp.length);
+    if(isNaN(jsyqValTemp.substr(1,1))){
+        fuhao = jsyqValTemp.substr(0,2);//取第二个符号
+        yaoqiuzhi = jsyqValTemp.substr(2,jsyqValTemp.length);
+    }
+    jsyqValArr = yaoqiuzhi.split("-");//技术要求内容
+    if(yaoqiuzhi =='' || isNaN(jsyqValArr[0]) || isNaN(mynumArr[0]) || !fuhaoObj[fuhao]){
+        return pdResTemp;
+    }
+    if(jsyqValArr.length==1){//技术要求不带"-"号,则实测值肯定带"-"号
+        let str = mynumArr[0]+fuhaoObj[fuhao]+jsyqValArr[0];
+        if(fuhaoObj[fuhao]==">" || fuhaoObj[fuhao]=="<="){
+            str = mynumArr[1]+fuhaoObj[fuhao]+jsyqValArr[0];
+        }
+        if(eval(str)) {
+            pdResTemp = 1;
+        }else{
+            pdResTemp = 0;
+        }
+    }else {//技术要求带"-"号,则实测值带"-"号不确定
+        if(isNaN(jsyqValArr[1])){
+            return pdResTemp;
+        }
+        if(mynumArr.length==1){//实测值不带"-"号
+            let str = mynumArr[0]+fuhaoObj[fuhao]+jsyqValArr[0];
+            if(fuhaoObj[fuhao]=="<" || fuhaoObj[fuhao]==">="){
+                str = mynumArr[0]+fuhaoObj[fuhao]+jsyqValArr[1];
+            }
+            if(eval(str)) {
+                pdResTemp = 1;
+            }else{
+                pdResTemp = 0;
+            }
+        }else {//实测值带"-"号
+            if(eval(mynumArr[0]+fuhaoObj[fuhao]+jsyqValArr[0]) && eval(mynumArr[1]+fuhaoObj[fuhao]+jsyqValArr[1])) {
+                pdResTemp = 1;
+            }else{
+                pdResTemp = 0;
+            }
+        }
+    }
+    return pdResTemp;
+}
+
+
+/**
+ * 查询流程状态
+ * @param data
+ * @returns {Promise<unknown>}
+ */
+function ratifyStep(data) {
+    return new Promise(function (resolve, reject) {
+        let ids = [];
+        for (let i = 0; i < data.length; i++) {
+            ids[ids.length] = data[i].id;
+        }
+        let sjdIds = "";
+        if (typeof ids == "number" || typeof ids == "string") {
+            sjdIds = ids;
+        } else {
+            sjdIds = ids.join(",")
+        }
+        reject(ids);
+    })
+}
+
+
+/**
+ * 实测值判定
+ * @param mynum
+ * @param jsyqValTemp
+ * @param fuhao
+ * @param fuhao2
+ * @returns {number}
+ */
+function judgeSczQualified(mynum,jsyqValTemp,fuhao,fuhao2) {
+    let pdResTemp = 2;
+    if(fuhao=='≥'|| fuhao2=='>=' || fuhao=='≧' ||  fuhao2=='＞＝' ){
+        let yaoqiuzhi = jsyqValTemp.substr(1,jsyqValTemp.length);
+        if(fuhao2=='>=' || fuhao2=='＞＝'){
+            yaoqiuzhi = jsyqValTemp.substr(2,jsyqValTemp.length);
+        }
+        if(yaoqiuzhi=='' || isNaN(yaoqiuzhi)){
+            return pdResTemp;
+        }
+        if(Number(mynum)>=Number(yaoqiuzhi)) {
+            pdResTemp = 1;
+        }else{
+            pdResTemp = 0;
+        }
+    }else if(fuhao=='＞' || fuhao=='>' ){
+        let yaoqiuzhi = jsyqValTemp.substr(1,jsyqValTemp.length);
+        if(yaoqiuzhi=='' || isNaN(yaoqiuzhi)){
+            return pdResTemp;
+        }
+
+        if(Number(mynum)> Number(yaoqiuzhi)) {
+            pdResTemp = 1;
+        }else{
+            pdResTemp = 0;
+        }
+    }else if(fuhao=='≤'|| fuhao2=='<=' || fuhao=='≦' ||  fuhao2=='＜＝' ){
+        let yaoqiuzhi = jsyqValTemp.substr(1,jsyqValTemp.length);
+        if(fuhao2=='<=' || fuhao2=='＜＝'){
+            yaoqiuzhi = jsyqValTemp.substr(2,jsyqValTemp.length);
+        }
+        if(yaoqiuzhi=='' || isNaN(yaoqiuzhi)){
+            return pdResTemp;
+        }
+        if(Number(mynum)<=Number(yaoqiuzhi)) {
+            pdResTemp = 1;
+        }else{
+            pdResTemp = 0;
+        }
+    } else if(fuhao=='＜' || fuhao=='<'){
+        let yaoqiuzhi = jsyqValTemp.substr(1,jsyqValTemp.length);
+        if(yaoqiuzhi=='' || isNaN(yaoqiuzhi)){
+            return pdResTemp;
+        }
+        if(Number(mynum) < Number(yaoqiuzhi)) {
+            pdResTemp = 1;
+        }else{
+            pdResTemp = 0;
+        }
+    }else if(fuhao=='±'){
+        let yaoqiuzhi = jsyqValTemp.substr(1,jsyqValTemp.length);
+        if(yaoqiuzhi=='' || isNaN(yaoqiuzhi)){
+            return pdResTemp;
+        }
+        if(Number(mynum) <= Number(yaoqiuzhi) && Number(mynum) >= 0 - Number(yaoqiuzhi) ) {
+            pdResTemp = 1;
+        }else{
+            pdResTemp = 0;
+        }
+    }else if(jsyqValTemp.indexOf('±')!= -1 && jsyqValTemp.split('±').length == 2){
+        //取中间符号
+        let jichuzhi = $.trim(jsyqValTemp.split('±')[0]);
+        let zhengfu_piancha = $.trim(jsyqValTemp.split('±')[1]);
+        if(jichuzhi =='' || isNaN(jichuzhi) || zhengfu_piancha =='' || isNaN(zhengfu_piancha)){
+            return pdResTemp;
+        }else{
+            if(Number(mynum)<=Number(jichuzhi) + Number(zhengfu_piancha) && Number(mynum)>=Number(jichuzhi) - Number(zhengfu_piancha) ){
+                pdResTemp = 1;
+            }else{
+                pdResTemp = 0;
+            }
+        }
+    }else if(jsyqValTemp.indexOf('～')!= -1 && jsyqValTemp.split('～').length == 2){
+        let xiaozhi = $.trim(jsyqValTemp.split('～')[0]);
+        let dazhi = $.trim(jsyqValTemp.split('～')[1]);
+
+        if(xiaozhi =='' || dazhi =='' ){
+            return pdResTemp;
+        }else if(isNaN(xiaozhi)  || isNaN(dazhi)){
+            let xiaozhi_num;
+            let dazhi_num;
+            if(isNaN(xiaozhi)){
+                let xiaozhi_fh = xiaozhi.substr(0,1);
+                let xiaozhi_value = xiaozhi.substr(1);
+                if(xiaozhi_fh == '-'||  xiaozhi_fh == '－' ){
+                    if(!isNaN(xiaozhi_value)){
+                        xiaozhi_num =  0 - Number(xiaozhi_value);
+                    }
+                }
+                if(xiaozhi_fh == '+' || xiaozhi_fh == '＋') {
+                    if(!isNaN(xiaozhi_value)){
+                        xiaozhi_num =   Number(xiaozhi_value);
+                    }
+                }
+            }else{
+                xiaozhi_num =  Number(xiaozhi);
+            }
+            if(isNaN(dazhi)){
+                let dazhi_fh = dazhi.substr(0,1);
+                let dazhi_value = dazhi.substr(1);
+                if(dazhi_fh == '-'||  dazhi_fh == '－' ){
+                    if(!isNaN(dazhi_value)){
+                        dazhi_num =  0 - Number(dazhi_value);
+                    }
+                }
+                if(dazhi_fh == '+' || dazhi_fh == '＋') {
+                    if(!isNaN(dazhi_value)){
+                        dazhi_num =   Number(dazhi_value);
+                    }
+                }
+            }else{
+                dazhi_num =  Number(dazhi);
+            }
+
+            if( Number(dazhi_num) < Number(xiaozhi_num)){
+                return pdResTemp;
+            }
+            let myNumArr = mynum.split(".");
+            let dazhiNumArr = dazhi_num.split(".");
+            if(Number(mynum) <= Number(dazhi_num)&& Number(mynum) >= Number(xiaozhi_num) && myNumArr.length == dazhiNumArr.length){
+                if(dazhiNumArr.length==1 || (dazhiNumArr.length>1 && dazhiNumArr[1].length == myNumArr[1].length)){
+                    pdResTemp = 1;
+                }else {
+                    pdResTemp = 0;
+                }
+            }else{
+                pdResTemp = 0;
+            }
+        }else{
+            if( Number(dazhi) < Number(xiaozhi)){
+                return pdResTemp;
+            }
+            let myNumArr = mynum.split(".");
+            let dazhiNumArr = dazhi.split(".");
+            if(Number(mynum) <= Number(dazhi)&& Number(mynum) >= Number(xiaozhi) && myNumArr.length == dazhiNumArr.length){
+                if(dazhiNumArr.length==1 || (dazhiNumArr.length>1 && dazhiNumArr[1].length == myNumArr[1].length)){
+                    pdResTemp = 1;
+                }else {
+                    pdResTemp = 0;
+                }
+            }else{
+                pdResTemp = 0;
+            }
+        }
+    }else if(jsyqValTemp.indexOf('±')!= -1 && jsyqValTemp.split('±').length == 2){
+        //取中间符号
+        let jichuzhi = $.trim(jsyqValTemp.split('±')[0]);
+        let zhengfu_piancha = $.trim(jsyqValTemp.split('±')[1]);
+        if(jichuzhi =='' || isNaN(jichuzhi) || zhengfu_piancha =='' || isNaN(zhengfu_piancha)){
+            return pdResTemp;
+        }else{
+            if(Number(mynum)<=Number(jichuzhi) + Number(zhengfu_piancha) && Number(mynum)>=Number(jichuzhi) - Number(zhengfu_piancha) ){
+                pdResTemp = 1;
+            }else{
+                pdResTemp = 0;
+            }
+        }
+    }else if(jsyqValTemp.indexOf('~')!= -1 && jsyqValTemp.split('~').length == 2){
+        let xiaozhi = $.trim(jsyqValTemp.split('~')[0]);
+        let dazhi = $.trim(jsyqValTemp.split('~')[1]);
+
+        if(xiaozhi =='' || dazhi =='' ){
+            return pdResTemp;
+        }else if(isNaN(xiaozhi)  || isNaN(dazhi)){
+            let xiaozhi_num;
+            let dazhi_num;
+            if(isNaN(xiaozhi)){
+                let xiaozhi_fh = xiaozhi.substr(0,1);
+                let xiaozhi_value = xiaozhi.substr(1);
+                if(xiaozhi_fh == '-'||  xiaozhi_fh == '－' ){
+                    if(!isNaN(xiaozhi_value)){
+                        xiaozhi_num =  0 - Number(xiaozhi_value);
+                    }
+                }
+                if(xiaozhi_fh == '+' || xiaozhi_fh == '＋') {
+                    if(!isNaN(xiaozhi_value)){
+                        xiaozhi_num =   Number(xiaozhi_value);
+                    }
+                }
+            }else{
+                xiaozhi_num =  Number(xiaozhi);
+            }
+            if(isNaN(dazhi)){
+                let dazhi_fh = dazhi.substr(0,1);
+                let dazhi_value = dazhi.substr(1);
+                if(dazhi_fh == '-'||  dazhi_fh == '－' ){
+                    if(!isNaN(dazhi_value)){
+                        dazhi_num =  0 - Number(dazhi_value);
+                    }
+                }
+                if(dazhi_fh == '+' || dazhi_fh == '＋') {
+                    if(!isNaN(dazhi_value)){
+                        dazhi_num =   Number(dazhi_value);
+                    }
+                }
+            }else{
+                dazhi_num =  Number(dazhi);
+            }
+
+            if( Number(dazhi_num) < Number(xiaozhi_num)){
+                return pdResTemp;
+            }
+            let myNumArr = mynum.split(".");
+            let dazhiNumArr = dazhi_num.split(".");
+            if(Number(mynum) <= Number(dazhi_num)&& Number(mynum) >= Number(xiaozhi_num) && myNumArr.length == dazhiNumArr.length){
+                if(dazhiNumArr.length==1 || (dazhiNumArr.length>1 && dazhiNumArr[1].length == myNumArr[1].length)){
+                    pdResTemp = 1;
+                }else {
+                    pdResTemp = 0;
+                }
+            }else{
+                pdResTemp = 0;
+            }
+        }
+        else{
+            if( Number(dazhi) < Number(xiaozhi)){
+                return pdResTemp;
+            }
+            let myNumArr = mynum.split(".");
+            let dazhiNumArr = dazhi.split(".");
+            if(Number(mynum) <= Number(dazhi)&& Number(mynum) >= Number(xiaozhi) && myNumArr.length == dazhiNumArr.length){
+                if(dazhiNumArr.length==1 || (dazhiNumArr.length>1 && dazhiNumArr[1].length == myNumArr[1].length)){
+                    pdResTemp = 1;
+                }else {
+                    pdResTemp = 0;
+                }
+            }else{
+                pdResTemp = 0;
+            }
+        }
+    }
+    return pdResTemp;
+}
+
+
+
+/**
+ * 获取人员单项评定满足值,不满足值显示
+ */
+function getUserPdlx() {
+    var obj={};
+    if(window.localStorage["getUserPdlx"] == null ){
+        $_PostSync("/qc/findParam/getUserPdlx", {"userId":localStorage.getItem("userId"),"cache":'false'}, function (res) {
+            window.localStorage["getUserPdlx"]=JSON.stringify(res);
+        });
+    }
+    let data = $.parseJSON( window.localStorage["getUserPdlx"] );
+    data = data.list;
+    if(data.length>0){
+        obj.satisfied_value = data[0].code;//满足值
+        obj.unsatisfied_value = data[0].remark;//不满足值
+    }else {
+        obj.satisfied_value = "合格";//满足值
+        obj.unsatisfied_value = "不合格";//不满足值
+    }
+
+    return obj;
+}
+
+/**
+ * 合并单元格
+ * @param res
+ * @param elm 需要合并的元素
+ * @param columsName 需要合并的列名称
+ * @param columsIndex 需要合并的列索引值
+ * @param margeRow 是否是批量设置时左侧项目列表的合并
+ * @param margeCheckBox 是否合并checkbox
+ */
+function merge(res,elm,columsName,columsIndex,margeRow,margeCheckBox) {
+    console.log(res,elm,'res,elm');
+    let tbody =  elm.find('.layui-table-box tbody') ;
+    let data = res.data;
+    for(let i=0;i<tbody.length;i++){
+        //合并行
+        if(margeRow == true){
+            mergeRow(data,tbody.eq(i),columsName,columsIndex);
+        }
+        //合并列
+        mergeCol(data,tbody.eq(i),columsName,columsIndex);
+        //合并checkbox
+        if(margeCheckBox == true){
+            mergeCheckbox(data,tbody.eq(i),columsName,columsIndex);
+        }
+    }
+}
+
+/**
+ * 跳转样品信息页
+ */
+function showSampleInfo(sjdId){
+    var index = layer.open({
+        type: 2 //此处以iframe举例
+        ,title: false
+        // ,title: ['样品信息','font-size:17px;text-align:center;font-weight:1000']
+        ,area: ['100%','100%']
+        ,shade:0.3
+        ,closeBtn:false
+        ,maxmin: false
+        ,content: '/qc/resources/views/sampleManager/commonSampleInfoPage.html?id='+sjdId
+        ,zIndex: layer.zIndex //重点1
+    });
+    layer.full(index);
+    // openEdit("样品信息", ['100%', '100%'], "/qc/resources/views/sampleManager/commonSampleInfoPage.html?sjdId="+sjdId, "submitCheck", reLoad);
+}
+
+/**
+ * 报告编号点击查询详情
+ * @param: sjdId 送检单编号
+ */
+function sjdInfoShow(sjdId){
+    let content = '/qc/resources/views/business/zjSjd-form.html?id='+sjdId+'&readOnly=true';
+    let trOne=$($('table').find('tr')[0]).find('th');
+    let tableWd=$(trOne[0]).width()+$(trOne[1]).width();
+    let iframeWidth = window.innerWidth ;
+    let layerWidtj = (iframeWidth-tableWd-10)+'px';
+    if($("#layui-layer-iframe"+nowLayerId).length ==0){
+        let paramObj = {
+            id: 'addButton',
+            type: 2,//此处以iframe举例
+            area: [layerWidtj, '99%'],
+            title: false,
+            closeBtn: 0,
+            offset: 'rt',
+            shade: 0,
+            region: 'east',
+            resize: true,
+            maxmin: false,
+            zIndex: layer.zIndex,//重点1
+            content: content,
+            end:()=>{nowLayerId =null},
+        } ;
+        nowLayerId = showCommonLayer(paramObj,"");
+        changed(nowLayerId)
+    }else {
+         $("#layui-layer-iframe"+nowLayerId).attr("src", content);
+    }
+};
+
+/**
+ * 修改记录
+ * @param sjdId
+ */
+function showUpdateRecord(sjdId) {
+    if (sjdId == undefined || sjdId == "") {
+        layer.msg('请选择一条记录！',{icon:2,time:1000});
+        return false;
+    }
+    let paramObj = {
+        type: 2 //此处以iframe举例
+        ,title: ['修改记录','font-size:17px;text-align:center;font-weight:1000']
+        , area: ['80%', '80%']
+        /*,btn: ["关闭"]*/
+        ,maxmin: false
+        ,resize:false
+        ,content: '/qc/resources/views/business/zjSjdUpdateRecord.html?id='+sjdId
+        ,zIndex: layer.zIndex
+    }
+    showCommonLayer(paramObj,"");
+}
+
+//合并行
+function mergeRow(data,elm,columsName,columsIndex){
+        //这里涉及到简单的运算，mark是计算每次需要合并的格子数
+        let mark = 1;
+        //所有行
+        // var trArr = $(".layui-table-body>.layui-table").find("tr");
+        let trArr = $(elm).find("tr");
+        //先合并行
+        for (let i = 0; i < data.length; i++) {
+            //获取当前行
+            let trCurArr = trArr.eq(i);
+            $(trCurArr).parent().parent().css("width","100%");
+            //循环列，要是后一列值为空，则与前一列合并
+            for (let k = 0; k < columsName.length; k++){
+                //后一行的值与前一行的值做比较，若后一行为空则合并
+                if (data[i][columsName[k]]==null) {
+                     mark += 1;
+                     // 获得当前的宽度，设置到前一列，然后隐藏当前列
+                    let trCurPrevAll = $(trCurArr.find("td").eq(columsIndex[k])).prevAll()
+                    trCurPrevAll.each(function () {
+                        if($(this).css("display") != "none"){
+                            let tdWidth = $(this)[0].offsetWidth
+                            let cellWidth = $(this).find('.layui-table-cell')[0].offsetWidth
+                            $(this).width(tdWidth+$(trCurArr.find("td").eq(columsIndex[k])).width())
+                            $(this).find('.layui-table-cell').width(cellWidth+$(trCurArr.find("td").eq(columsIndex[k])).find('.layui-table-cell').width())
+                            $(this).attr("colspan", mark);
+                            return false ;
+                        }
+                    }) ;
+
+                    $(trCurArr.find("td").eq(columsIndex[k])).css("display", "none");
+                }else{
+                    //一旦前后两行的值没有空值，那么需要合并的格子数mark就需要重新计算
+                    mark = 1;
+                }
+            }
+            mark = 1;
+        }
+}
+
+//合并列
+function mergeCol(data,elm,columsName,columsIndex){
+//定位需要添加合并属性的行数
+    var mergeIndex = 0;
+    //这里涉及到简单的运算，mark是计算每次需要合并的格子数
+    var mark = 1;
+    //循环所有要合并的列
+    for (var k = 0; k < columsName.length; k++){
+        //所有行
+        // var trArr = $(".layui-table-body>.layui-table").find("tr");
+        var trArr = $(elm).find("tr");
+        //这里循环表格当前的数据
+        dataFor:
+        for (var i = 1; i < data.length; i++) {
+            //获取当前行的当前列
+            var tdCurArr = trArr.eq(i).find("td").eq(columsIndex[k]);
+            //获取相同列的第一列
+            var tdPreArr = trArr.eq(mergeIndex).find("td").eq(columsIndex[k]);
+            //后一行的值与前一行的值做比较，相同就需要合并
+
+
+            // if (data[i][columsName[k]] === data[i - 1][columsName[k]]&&data[i][columsName[k]]!=null) {
+            if (($(tdPreArr).css('display')!='none' && $(tdCurArr).css('display')!='none') && data[i][columsName[k]] === data[i - 1][columsName[k]] && $(tdCurArr).attr('colspan')==$(tdPreArr).attr('colspan')) {
+                // if(k>0 && data[i][columsName[k-1]] != data[i - 1][columsName[k-1]]){
+                //前一列的值不一样 || 前一列没有隐藏 ，那么需要合并的格子数mark就需要重新计算
+                if(k>0  && ((data[i][columsName[k-1]] != data[i - 1][columsName[k-1]]) || (trArr.eq(i).find("td").eq(columsIndex[k]-1).css('display')!='none') )){
+                        mergeIndex = i;
+                    mark = 1;
+                    continue dataFor;
+                }
+                mark += 1;
+                //相同列的第一列增加rowspan属性
+                tdPreArr.each(function () {
+                    $(this).attr("rowspan", mark);
+                });
+                //当前列隐藏
+                tdCurArr.each(function () {
+                    $(this).css("display", "none");
+                });
+            } else{
+                mergeIndex = i;
+                //一旦前后两行的值不一样了，那么需要合并的格子数mark就需要重新计算
+                mark = 1;
+            }
+
+        }
+        mergeIndex = 0;
+        mark = 1;
+    }
+}
+
+//合并checbox
+function mergeCheckbox(data,elm,columsName,columsIndex){
+        //取合并过的name1列
+        var tdName1Arr = $(elm).find("td[rowspan][data-field=name1]");
+        if(tdName1Arr.length>0){
+            //循环合并过的name1列，判断name1、name2、name3的值是否相等
+            for(var a=0;a<tdName1Arr.length;a++){
+                var itemIds = '';
+                //得到当前name1列所在的行
+                var curRow = $(tdName1Arr[a].parentElement);
+                //合并行的rowIndex
+                var rowspanIndex = '';
+                //当前行的index
+                var dataIndex = curRow.attr('data-index');
+                var rowIndex = curRow.attr('data-index');
+                //name1的值
+                var name1Rowspan = $($("td[rowspan][data-field=name1]")[a]).attr('rowspan');
+                //name2的值
+                var name2Rowspan = $($("td[rowspan][data-field=name1]")[a]).parent().find('td[data-field=name2]').attr('rowspan');
+                //name3的值
+                var name3Rowspan = $($("td[rowspan][data-field=name1]")[a]).parent().find('td[data-field=name3]').attr('rowspan');
+                //获取合并行的item_id，后面拼接的itemId都存在这里
+                var itemIdTd = $('tr[data-index='+dataIndex+']').find('td[data-field=item_id] .layui-table-cell');
+                var name2text = $('tr[data-index='+dataIndex+']').find('td[data-field=name2] .layui-table-cell').text();
+                var name3text = $('tr[data-index='+dataIndex+']').find('td[data-field=name3] .layui-table-cell').text();
+                if((name1Rowspan==name2Rowspan && name2Rowspan==name3Rowspan)||(name2text==name3text && name2text=='') ||(name1Rowspan==name2Rowspan)){
+                // if((name1Rowspan==name2Rowspan || name2Rowspan==name3Rowspan || name1Rowspan==name3Rowspan )){
+                    for(var b=0;b<name1Rowspan;b++){
+                        rowspanIndex = dataIndex;
+                        //获取合并行每行的item_id
+                        itemIds += $('tr[data-index='+rowspanIndex+']').find('td[data-field=item_id] .layui-table-cell').text()+',';
+                        dataIndex++;
+                    }
+                    //给checkbox加上rowspan
+                    $(tdName1Arr[a].parentElement).find("td[data-field=0]").attr('rowspan',name1Rowspan);
+                    //隐藏合并行的checkbox
+                    for(var n=1;n<name1Rowspan;n++){
+                        rowIndex++;
+                        $('tr[data-index='+rowIndex+']').find('td[data-field=0]').hide();
+                    }
+                    //存入拼接后的item_id
+                    itemIdTd.text(itemIds.substr(0,itemIds.length-1));
+                }
+            }
+        }
+}
+
+/**
+ * name1~name3去重获取数据
+ */
+function uniqueArray(data) {
+    var temp = {};   //用于name1~name3判断重复
+    var uniqueArray = [];  //去重后的数组
+    var sameNameItemId= [];//相同项目名称,项目ids,以及需存放的位置
+    //遍历数组，将每个item.name~name3在temp中是否存在值做判断
+    data.map(function (item, index) {
+        if(!temp[item.name1+"@#"+item.name2+"@#"+item.name3]){
+            uniqueArray.push(item);
+            temp[item.name1+"@#"+item.name2+"@#"+item.name3] = true;
+            sameNameItemId.push({names:item.name1+"@#"+item.name2+"@#"+item.name3,item_id:item.item_id,postion:uniqueArray.length-1});
+        }else{
+            for( var i=0;i < sameNameItemId.length;i++){
+                if(sameNameItemId[i].names == item.name1+"@#"+item.name2+"@#"+item.name3){
+                    sameNameItemId[i].item_id = sameNameItemId[i].item_id +"," + item.item_id;
+                }
+            }
+        }
+    });
+    for(var j=0;j<sameNameItemId.length;j++){
+        uniqueArray[sameNameItemId[j].postion].item_id =sameNameItemId[j].item_id;
+    }
+    return uniqueArray;
+}
+
+//保存数据字典表
+function saveSldwDict(nodeId,value){
+
+    $_PostSync("/qc/commonController/saveDictForZj/", {nodeId:nodeId,text:value}, function (res) {
+        if (res.code == 0) {
+
+        } else {
+            layer.msg('数据保存入数据字典表异常！')
+        }
+    });
+}
+
+//添加标准项目的回调方法
+//2023.1.6 彭家豪 查找window对象错误修改
+function addBzItemFunction(itemIds) {
+    var a1 = JSON.parse(top.njmindTools.addBzItemMenuId);
+    var a2 = $("#"+a1.needAddItemPageId);
+    var a3 = a2.find("iframe");
+    var a4 = a3[0].name;
+    var a5 = $(window.frames[a4])[0];
+    $(a5.document).find('#itemMain')[0].contentWindow.addItem4PriceCapabilityBase(itemIds);
+}
+
+//添加对象项目的回调方法
+//2023.1.6 彭家豪 xmInfo.html调用查找window对象错误修改，由于还有别的地方调用，保留原逻辑添加判断
+function addDxItemFunction(itemIds) {
+    if($(window.frames[$("#"+JSON.parse(top.njmindTools.addDxItemMenuId).needAddItemPageId).find("iframe")[0].name])[0].hasOwnProperty('addItem4PriceCapabilityBase')){
+        $(window.frames[$("#"+JSON.parse(top.njmindTools.addDxItemMenuId).needAddItemPageId).find("iframe")[0].name])[0].addItem4PriceCapabilityBase(itemIds);
+    }else{
+        var a1 = JSON.parse(top.njmindTools.addDxItemMenuId);
+        var a2 = $("#"+a1.needAddItemPageId);
+        var a3 = a2.find("iframe");
+        var a4 = a3[0].name;
+        var a5 = $(window.frames[a4])[0];
+        $(a5.document).find('#itemMain')[0].contentWindow.addItem4PriceCapabilityBase(itemIds);
+    }
+
+}
+
+//业务流程新增项目并保存
+function addItemByPriceCapabilityBase(itemIds,sjdId){
+    $_PostSync("/qc/zjSjdItem/addItem", {itemIds: itemIds,sjdId:sjdId}, function (result) {
+        if (result.code ==0) {
+
+        }else{
+            layer.msg('添加项目失败！',{icon: 2});
+        }
+    });
+}
+
+
+
+//渲染技术要求autoComplete  根据送检单id查询送检单项目的多条件标准值
+// function initAutoComplete(item_id,index){
+//     var data = new Object();
+//     $_PostSync("/qc/zjItemStandardVal/getBzValueByItemId/", {item_id:item_id}, function (res) {
+//         if(res.code=='0'){
+//             data = res.data;
+//             if(data.length>0){
+//                 for(var i=0;i<data.length;i++){
+//                     var html = '';//拼接下拉显示信息
+//                     if(data[i].condition1 !=undefined){
+//                         html += 'C1:<span class="autoSpan">&nbsp;'+data[i].condition1+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+//                     }if(data[i].condition2 !=undefined){
+//                         html += 'C2:<span class="autoSpan">&nbsp;'+data[i].condition2+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+//                     }if(data[i].condition3 !=undefined){
+//                         html += 'C3:<span class="autoSpan">&nbsp;'+data[i].condition3+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+//                     }if(data[i].condition4 !=undefined){
+//                         html += 'C4:<span class="autoSpan">&nbsp;'+data[i].condition4+' </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+//                     }if(data[i].condition5 !=undefined){
+//                         html += 'C5:<span class="autoSpan">&nbsp;'+data[i].condition5+' </span><br>'
+//                     }if(data[i].standard_value !=undefined){
+//                         html += '<span>VAL:&nbsp;</span>' +
+//                             '<span class=\'layui-badge layui-bg-gray\'>'+data[i].standard_value +'</span><br>'
+//                     }
+//                     data[i]['html'] = html;//将拼接的页面作为一个属性复制给对象
+//                 }
+//                 autocomplete.render({
+//                     elem: $('input[name="jsyq"]')[index],
+//                     // url: '/qc/zjItemStandardVal/getBzValueByItemId',
+//                     // defultDate:[{condtion1:"123456",standard_value:"888"},{condtion1:"12",standard_value:"558585"}],
+//                     defultDate:data,
+//                     // keywords: 'item_id',
+//                     template_val: '{{d.standard_value}}',
+//                     template_txt: '{{d.html}}',
+//                     //选中的回调事件
+//                     onselect: function (resp) {
+//                         // //项目检验，技术要求change事件  standard_value选择的标准值
+//                         if(typeof inputChange == 'function'){
+//                             inputChange($('input[name="jsyq"]')[index],'jsyq');
+//                         }
+//                     },
+//                     //焦点移出事件
+//                     mouseOutFunction: function (resp) {
+//                         // //设置下当前的id
+//                         // $("#sjdId").val("");
+//                         // //刷新iframe
+//                         // showSjdFomeDetail("");
+//                     }
+//                 })
+//             }
+//
+//         }else{
+//             layer.msg('数据异常！');
+//         }
+//     })
+//
+// }
+
+//渲染技术要求autoComplete  根据价格能力库id查询送检单项目的多条件标准值
+function initJsyqAutoComplete(stand_item_id,tableData){
+    if(stand_item_id!=null && stand_item_id.length>0 && stand_item_id[0]!=null){
+        $_PostSync("/qc/zjItemStandardVal/getBzValueByItemId/", {item_id:stand_item_id}, function (res) {
+            if(res.code=='0'){
+                //项目的多条件标准值
+                standardValueData = res.data;
+                if(tableData.length>0){
+                    for(var i=0;i<tableData.length;i++){
+                        if(standardValueData.length>0){
+                            for(var k=0;k<standardValueData.length;k++){
+                                let html = '';//拼接下拉显示信息
+                                if(standardValueData[k].condition1 !=undefined){
+                                    html += 'T1:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition1)+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition2 !=undefined){
+                                    html += 'T2:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition2)+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition3 !=undefined){
+                                    html += 'T3:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition3)+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition4 !=undefined){
+                                    html += 'T4:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition4)+' </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition5 !=undefined){
+                                    html += 'T5:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition5)+' </span><br>'
+                                }if(standardValueData[k].standard_value !=undefined){
+                                    html += '<span>Z:&nbsp;</span>' +
+                                        '<span class=\'layui-badge layui-bg-gray\'>'+jugeNull(standardValueData[k].standard_value) +'</span><hr>'
+                                }
+                                standardValueData[k]['html'] = html;//将拼接的页面作为一个属性复制给对象
+                            }
+                        }
+                    }
+                }
+            }else{
+                layer.msg('数据异常！');
+            }
+        })
+    }
+}
+
+//渲染技术要求autoComplete  根据价格能力库id查询送检单项目的多条件标准值
+function initAutoComplete(stand_item_id,tableData){
+    if(stand_item_id!=null && stand_item_id.length>0){
+        $_PostSync("/qc/zjItemStandardVal/getBzValueByItemId/", {item_id:stand_item_id}, function (res) {
+            if(res.code=='0'){
+                //项目的多条件标准值
+                standardValueData = res.data;
+                if(tableData.length>0){
+                    for(var i=0;i<tableData.length;i++){
+                        if(standardValueData.length>0){
+                            for(var k=0;k<standardValueData.length;k++){
+                                let html = '';//拼接下拉显示信息
+                                if(standardValueData[k].condition1 !=undefined){
+                                    html += 'T1:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition1)+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition2 !=undefined){
+                                    html += 'T2:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition2)+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition3 !=undefined){
+                                    html += 'T3:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition3)+'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition4 !=undefined){
+                                    html += 'T4:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition4)+' </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>'
+                                }if(standardValueData[k].condition5 !=undefined){
+                                    html += 'T5:<span class="autoSpan">&nbsp;'+jugeNull(standardValueData[k].condition5)+' </span><br>'
+                                }if(standardValueData[k].standard_value !=undefined){
+                                    html += '<span>Z:&nbsp;</span>' +
+                                        '<span class=\'layui-badge layui-bg-gray\'>'+jugeNull(standardValueData[k].standard_value) +'</span><hr>'
+                                }
+                                standardValueData[k]['html'] = html;//将拼接的页面作为一个属性复制给对象
+                            }
+                        }
+                    }
+                }
+            }else{
+                layer.msg('数据异常！');
+            }
+        })
+    }
+}
+
+/**
+ * 初始化技术要求html
+ */
+function initTecRequirements(d,tableId) {
+    let lay_index = d.LAY_INDEX ;
+    let lay_table_index = d.LAY_TABLE_INDEX ;
+    let tec_requirements = d.tec_requirements ;
+    let tiaojian_flag = d.tiaojian_flag ;
+    let item_id = d.item_id ;
+    if(tec_requirements == null || tec_requirements == ""){
+        tec_requirements = defaultSpace ;
+    }
+    return "<div name='tec_requirementsAutoCompleteOnClickDiv' style=\"width: 100%;"+(tiaojian_flag == '1' ? "background-color: #878ff35c;":"")+" \"  " +
+        "onmouseup='autoCompleteOnClick(\"tec_requirements\",this,"+tiaojian_flag+","+item_id+","+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+        "onclick='autoCompleteOnClick(\"tec_requirements\",this,"+tiaojian_flag+","+item_id+","+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+        "class=\"layui-table-cell laytable-cell-1-0-2\">" +
+        "<div class='tec_requirements_val'>"+tec_requirements+"</div>" +
+        "</div>";
+}
+
+/**
+ * 初始化检验方法html
+ */
+function initTestWayHtml(d,tableId) {
+    let lay_index = d.LAY_INDEX ;
+    let lay_table_index = d.LAY_TABLE_INDEX ;
+    let test_way = d.test_way ;
+    let testWayFlag = 0 ;
+    testWayValueData[d.item_id] = d.test_way ;
+    let test_wayVal = "" ;
+    let test_waySel = "" ;
+    if(test_way != null){
+         let arr = test_way.split("%#~");
+        test_wayVal = arr[0];
+         if(arr.length==2){
+            test_waySel  = arr[1];
+         }else {
+             test_waySel = arr[0];
+         }
+    }
+    if(test_waySel.split("~#%").length>1 && test_waySel.split("~#%")[0] != ""){
+        testWayFlag = 1 ;
+        if(test_wayVal == ""){
+            test_wayVal = test_waySel.split("~#%")[0];
+            testWayValueData[d.item_id] = test_wayVal+"%#~"+d.test_way ;
+        }
+    }
+    if(test_wayVal == null || test_wayVal == ""){
+        test_wayVal = defaultSpace ;
+    }
+    return "<div name='test_wayAutoCompleteOnClickDiv' style=\"width: 100%;"+(testWayFlag == '1' ? "background-color: #878ff35c;":"")+"\"  " +
+        "onmouseup='autoCompleteOnClick(\"test_way\",this,"+testWayFlag+","+d.item_id+","+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+        "onclick='autoCompleteOnClick(\"test_way\",this,"+testWayFlag+","+d.item_id+","+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+        "class=\"layui-table-cell laytable-cell-1-0-2\">" +
+        "<div class='test_way_val'>"+test_wayVal+"</div>" +
+        "</div>";
+}
+
+/**
+ * 初始化单向判定html
+ */
+function initDxjlHtml(d,tableId) {
+    let lay_index = d.LAY_INDEX ;
+    let lay_table_index = d.LAY_TABLE_INDEX ;
+    let dxjl = d.dxjl ;
+    if(dxjl == null || dxjl == ""){
+        dxjl = defaultSpace ;
+    }
+    let str = '';
+    if(d.biao_shi=='1'){
+        str = "<div name='dxjlAutoCompleteOnClickDiv' style='width: 100%;'class='layui-table-cell laytable-cell-1-0-2'>" +
+            "   <div style='pointer-events: none;'>"+dxjl+"</div>" +
+            "</div>";
+    }else {
+        str = "<div name='dxjlAutoCompleteOnClickDiv' style=\"width: 100%;\"  " +
+            "onmouseup='autoCompleteOnClick(\"dxjl\",this,\"1\",null,"+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+            "onclick='autoCompleteOnClick(\"dxjl\",this,\"1\",null,"+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+            "class=\"layui-table-cell laytable-cell-1-0-2\">" +
+            "<div class='dxjl_val'>"+dxjl+"</div>" +
+            "</div>";
+    }
+    return str;
+}
+
+/**
+ * 初始化价格html
+ */
+function initPriceHtml(d,tableId,fee_status) {
+    let lay_index = d.LAY_INDEX ;
+    let lay_table_index = d.LAY_TABLE_INDEX ;
+    let price = d.price ;
+    if(price == null || price == ""){
+        price = defaultSpace ;
+    }
+    let str = '';
+    if(fee_status=='1'){
+        str = "<div name='priceAutoCompleteOnClickDiv' style='width: 100%;'class='layui-table-cell laytable-cell-1-0-2'>" +
+            "   <div style='pointer-events: none;'>"+price+"</div>" +
+            "</div>";
+    }else {
+        str = "<div name='priceAutoCompleteOnClickDiv' style=\"width: 100%;\"  " +
+            "onclick='autoCompleteOnClick(\"price\",this,\"0\",null,"+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+            "class=\"layui-table-cell laytable-cell-1-0-2\">" +
+            "<div class='price_val'>"+price+"</div>" +
+            "</div>";
+    }
+    return str;
+}
+/**
+ * 实测值html
+ */
+function initSczHtml(d,tableId,sczStr) {
+    let data = d[sczStr];
+    if(data == null || data == ""){
+        data = defaultSpace ;
+    }
+    let lay_index = d.LAY_INDEX ;
+    let lay_table_index = d.LAY_TABLE_INDEX ;
+    let str = "";
+    if(d.biao_shi=='1'){
+        str = "<div name='"+sczStr+"AutoCompleteOnClickDiv' style='width: 100%;' class='layui-table-cell laytable-cell-1-0-2'>" +
+            "  <div style='pointer-events: none;'>"+data+"</div>" +
+            "</div>";
+    }else {
+        // 质检请求增加实测值"符合","不符合"的自动选择框
+        str = "<div name='" + sczStr + "AutoCompleteOnClickDiv' style='width: 100%;'" +
+            " onmouseup='autoCompleteOnClick(\"" + sczStr + "\",this,\"1\",null," + lay_index + "," + lay_table_index + ",\"" + tableId + "\",event)' " +
+            " onclick='autoCompleteOnClick(\"" + sczStr + "\",this,\"1\",null," + lay_index + "," + lay_table_index + ",\"" + tableId + "\",event)' " +
+            " class='layui-table-cell laytable-cell-1-0-2'>" +
+            "  <div class='" + sczStr + "_val'>" + data + "</div>" +
+            "</div>"
+    }
+    return str;
+}
+
+/**
+ * 初始化执行人下拉html
+ */
+function initZxrHtml(d,tableId) {
+    let lay_index = d.LAY_INDEX ;
+    let lay_table_index = d.LAY_TABLE_INDEX ;
+    let zxr_name = d.zxr_name ;
+    if(zxr_name == null || zxr_name == ""){
+        zxr_name = defaultSpace ;
+    }
+
+    return "<div name='zxrAutoCompleteOnClickDiv' style=\"width: 100%;\"  " +
+        "onmouseup='autoCompleteOnClick(\"zxr_name\",this,\"1\","+d.zxz+","+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+        "onclick='autoCompleteOnClick(\"zxr_name\",this,\"1\","+d.zxz+","+lay_index+","+lay_table_index+",\""+tableId+"\",event)' " +
+        "class=\"layui-table-cell laytable-cell-1-0-2\">" +
+        "<div class='zxr_name_val'>"+zxr_name+"</div>" +
+        "</div>";
+}
+// function autosize(obj) {
+//     var el = $(obj);
+//     setTimeout(function() {
+//         el.css({'height':'auto', 'padding':'0'})
+//         el.css({'height':el.scrollHeight + 'px!important'});
+//     }, 0);
+// }
+// 渲染autocomplete
+function autoCompleteOnClick(type,obj,needAuto,dataKeyId,lay_index,lay_table_index,tableId,e){
+    console.log("autoCompleteOnClick",type,obj,needAuto,dataKeyId,lay_index,lay_table_index,tableId);
+    // 生成input
+    if(e.button==2){ //鼠标右键
+        if(e.target.tagName!='TEXTAREA'){
+            obj.oncontextmenu = function(e){
+                e.preventDefault();
+            };
+        }
+        $(".layui-form-autocomplete-focus").remove()
+        let i = $(obj);
+        let n = $('<input clickDiveName="'+type+'AutoCompleteOnClickDiv" class="layui-input layui-table-edit " style="height: 100%!important">');
+        // table
+        if(i.find(".layui-table-edit").length >0){
+            i.find(".layui-table-edit").eq(0).focus()
+            var evtObj = document.createEvent('UIEvents');
+            evtObj.initUIEvent('input', true, true, window, 1 );
+            i.find(".layui-table-edit").eq(0)[0].dispatchEvent(evtObj)
+            return ;
+        }else {
+            let value = i.children("."+type+"_val").html() ;
+            if(value == defaultSpace){
+                value = "" ;
+            }
+            n[0].value = value.replace(/<br>/g,'\n');
+            i.append(n);
+            n.focus();
+            $(n).change(function () {
+                let value = $(n).val().replace(/\n/g,'<br >');
+                let showValue = (value == "" ? defaultSpace:value) ;
+                let saveValue = value ;
+                if(type == "test_way" ){
+                    if (!!testWayValueData[dataKeyId]) {
+                        let test_way = testWayValueData[dataKeyId] ;
+                        test_way = test_way.split("%#~")[1] ;
+                        saveValue = saveValue+"%#~"+test_way;
+                    }
+                }
+                if(type == "zxr_name"){
+                }else{
+                    doAutoCompleteSetVal(type,showValue,saveValue,"."+type+"_val",lay_index,lay_table_index,tableId);
+                }
+                if(type == "tec_requirements" ){
+                    // //项目检验，技术要求change事件  standard_value选择的标准值
+                    if(typeof inputChange4Pd == 'function'){
+                        inputChange4Pd(i,'jsyq',tableId);
+                    }
+                }else if(type == "dxjl" ){
+                    if(typeof dxpdChange == 'function'){
+                        dxpdChange(i,tableId);
+                    }
+                }else if(type == "zxr_name" ){
+                    if(typeof zxrChange == 'function'){
+                        zxrChange(i,tableId);
+                    }
+                }else if(type.indexOf("scz")!=-1){
+                    // //项目检验，技术要求change事件  standard_value选择的标准值
+                    if(typeof inputChange4Pd == 'function'){
+                        inputChange4Pd(i,type,tableId);
+                    }
+                    if( typeof autoSaveItemInfo == 'function'){
+                        autoSaveItemInfo();
+                    }
+                } else if (type == "zydw") {
+                    if (typeof zydwChange == 'function') {
+                        zydwChange(i, tableId);
+                    }
+                }
+                // $(n).remove();
+            })
+        }
+        if(needAuto == "1"){
+            // 数据ID在的话，找数据
+            let tempData = [] ;
+            let template_val =  'val';
+            let template_txt =  'html';
+            if(!!dataKeyId) {
+                if(type == "tec_requirements" ){
+                    template_val =  'standard_value';
+                    template_txt =  'html';
+                    if (standardValueData.length > 0) {
+                        for (var k = 0; k < standardValueData.length; k++) {
+                            if (standardValueData[k].item_id == dataKeyId) {
+                                tempData.push(standardValueData[k]);
+                            }
+                        }
+                    }
+                }else if(type == "test_way" ){
+                    if (!!testWayValueData[dataKeyId]) {
+                        let test_way = testWayValueData[dataKeyId] ;
+                        test_way = test_way.split("%#~")[1].split("~#%") ;
+                        for(let i=0;i<test_way.length;i++){
+                            tempData[tempData.length] = {val:test_way[i],html:test_way[i]};
+                        }
+                    }
+                }else if(type == "zxr_name" ){
+                    $_PostSync("/qc/zjZuglService/findGroupUserIds/" + dataKeyId, {}, function (res) {
+                        var data = res.data;
+                        for(var ii =0 ; ii<data.length;ii++){
+                            var tempObj = {val:data[ii].code,html:data[ii].remark};
+                            tempData.push(tempObj);
+                        }
+                    });
+                }
+            }else {
+                if(type == "dxjl" ){
+                    tempData = [{val:userPdlx.satisfied_value,html:userPdlx.satisfied_value},{val:userPdlx.unsatisfied_value,html:userPdlx.unsatisfied_value}];
+                } else if (type == "scz") {
+                    tempData = [{val:'符合',html:'符合'},{val:'不符合',html:'不符合'}];
+                }
+            }
+            // 绑定autoComplete
+            autocomplete.render({
+                elem: n[0],
+                defultDate:tempData,
+                template_val: '{{d.'+template_val+'}}',
+                template_txt: '{{d.'+template_txt+'}}',
+                //选中的回调事件
+                onselect: function (resp) {
+                    let value = resp[template_val];
+                    value = value==null ?"":value;
+                    let showValue = (value == "" ? defaultSpace:value) ;
+                    let saveValue = value ;
+                    let showTxt = resp[template_txt] ;
+                    if(type == "test_way" ){
+                        if (!!testWayValueData[dataKeyId]) {
+                            let test_way = testWayValueData[dataKeyId] ;
+                            test_way = test_way.split("%#~")[1] ;
+                            saveValue = saveValue+"%#~"+test_way;
+                        }
+                    }
+                    //设置单元格的值
+                    doAutoCompleteSetVal(type,showValue,saveValue,"."+type+"_val",lay_index,lay_table_index,tableId,showTxt);
+                    if (type == "tec_requirements") {
+                        // //项目检验，技术要求change事件  standard_value选择的标准值
+                        if (typeof inputChange4Pd == 'function') {
+                            inputChange4Pd(i, 'jsyq', tableId);
+                        }
+                    } else if (type == "dxjl") {
+                        if (typeof dxpdChange == 'function') {
+                            dxpdChange(i, tableId);
+                        }
+                    } else if (type == "zxr_name") {
+                        if (typeof zxrChange == 'function') {
+                            zxrChange(i, tableId);
+                        }
+                    } else if (type == "zydw") {
+                        if (typeof zydwChange == 'function') {
+                            zydwChange(i, tableId);
+                        }
+                    }else if(type == "scz"){
+                        // //项目检验，技术要求change事件  standard_value选择的标准值
+                        if(typeof inputChange4Pd == 'function'){
+                            inputChange4Pd(i,type,tableId);
+                        }
+                        if( typeof autoSaveItemInfo == 'function'){
+                            autoSaveItemInfo();
+                        }
+                    }
+                    i.find(".layui-table-edit").eq(0).hide();
+                },
+            });
+
+            setTimeout(()=>{
+                i.find(".layui-table-edit").eq(0).focus();
+            })
+            return ;
+        }
+    }else if(e.button==0){ //鼠标左键
+        let i = $(obj);
+        let csHeight= $(obj).parents('td').height();
+        let n = $('<textarea clickDiveName="'+type+'AutoCompleteOnClickDiv" id="textarea" class="layui-table-edit " style="line-height:20px;padding: 0;height: '+csHeight+'px;margin-top:'+(-($(obj).parents('td').height()-$(obj).height())/2)+'px">');
+        // table
+        if(i.find(".layui-table-edit").length >0){
+            // i.find(".layui-table-edit").eq(0).focus()
+            // var evtObj = document.createEvent('UIEvents');
+            // evtObj.initUIEvent('input', true, true, window, 1 );
+            // i.find(".layui-table-edit").eq(0)[0].dispatchEvent(evtObj)
+            // return ;
+        }else {
+            let value = i.children("." + type + "_val").html();
+            if (value == defaultSpace) {
+                value = "";
+            }
+            n[0].value = value.replace(/<br>/g,'\n');
+            i.append(n);
+            n.focus();
+            setTimeout(function () {
+                // n.select();
+                n.setSelectionRange(0,0);
+            },10)
+        }
+        function textareaH(){
+            let obj = $(n),
+                len = obj.length;
+            for (let i = 0; i < len; i++) {
+                obj[i].style.height = obj[i].scrollHeight+2 + 'px';
+                $($(obj[i]).parents(".layui-table-body").next('.layui-table-fixed').find(".layui-table-body").find('tr')[obj.parents('tr').attr("data-index")]).css("height", obj[i].scrollHeight+2 + 'px')
+                $(obj[i]).parents('td').css({"height": obj[i].scrollHeight+2 + 'px'})
+                obj[i].style.marginTop = -($(obj[i]).parents('td').height() - obj.parent().height()) / 2 + 'px'
+            }
+            // let widths = 0;
+            // let html = document.createElement('span');
+            // html.innerText = $(n).val();
+            // html.className = 'getTextWidth';
+            // document.querySelector('body').appendChild(html);
+            // widths = document.querySelector('.getTextWidth').offsetWidth;
+            // document.querySelector('.getTextWidth').remove();
+            // // let changeHeight=Math.ceil(widths/$(n).width())*18+4
+            // let changeHeight=Math.ceil(widths/$(n).width())*18+4>csHeight?Math.ceil(widths/$(n).width())*20+4:csHeight;
+            // $(n)[0].style.height = changeHeight + 'px';
+            // $($($(n)[0]).parents(".layui-table-body").next('.layui-table-fixed').find(".layui-table-body").find('tr')[$(n).parents('tr').attr("data-index")]).css("height",changeHeight+'px')
+            // $($(n)[0]).parents('td').css({"height":changeHeight+'px','overflow':'hidden'})
+            // $(n)[0].style.marginTop = -($($(n)[0]).parents('td').height()-$(n).parent().height())/2+'px'
+        }
+//监听键盘事件
+        $(n).bind('input propertychange',function(){
+            $(n).prev('div').html('')
+            textareaH();
+        });
+        $(n).change(function () {
+            let value = $(n).val().replace(/\n/g,'<br >');
+            let showValue = (value == "" ? defaultSpace:value) ;
+            let saveValue = value ;
+            if(type == "test_way" ){
+                if (!!testWayValueData[dataKeyId]) {
+                    let test_way = testWayValueData[dataKeyId] ;
+                    test_way = test_way.split("%#~")[1] ;
+                    saveValue = saveValue+"%#~"+test_way;
+                }
+            }
+            if(type == "zxr_name"){
+            }else{
+                doAutoCompleteSetVal(type,showValue,saveValue,"."+type+"_val",lay_index,lay_table_index,tableId);
+            }
+            if(type == "tec_requirements" ){
+                // //项目检验，技术要求change事件  standard_value选择的标准值
+                if(typeof inputChange4Pd == 'function'){
+                    inputChange4Pd(i,'jsyq',tableId);
+                }
+            }else if(type == "dxjl" ){
+                if(typeof dxpdChange == 'function'){
+                    dxpdChange(i,tableId);
+                }
+            }else if(type == "zxr_name" ){
+                if(typeof zxrChange == 'function'){
+                    zxrChange(i,tableId);
+                }
+            }else if(type.indexOf("scz")!=-1){
+                // //项目检验，技术要求change事件  standard_value选择的标准值
+                if(typeof inputChange4Pd == 'function'){
+                    inputChange4Pd(i,type,tableId);
+                }
+                if( typeof autoSaveItemInfo == 'function'){
+                    autoSaveItemInfo();
+                }
+            } else if (type == "zydw") {
+                if (typeof zydwChange == 'function') {
+                    zydwChange(i, tableId);
+                }
+            }
+            // $(n).remove();
+        })
+    }
+}
+
+function doAutoCompleteSetVal(key,showValue,saveValue,className,lay_index,lay_table_index,tableId,showTxt){
+    let _$ = tableInfo.config.elem.next();
+    if (key == "zxr_name") {
+        _$.find('tr[data-index="' + (lay_table_index) + '"]').children('td[data-field="' + key + '"]').find(className).html(showTxt);
+        table.cache[tableId][lay_table_index][key] = showTxt;
+        table.cache[tableId][lay_table_index].zxr = saveValue;
+        fixTableHeight({
+            tr: _$.find('tr[data-index="' + lay_table_index + '"]'),
+            field: key,
+            value: showValue,
+        })
+    } else {
+        _$.find('tr[data-index="' + lay_table_index + '"]').children('td[data-field="' + key + '"]').find(className).html(showValue);
+        table.cache[tableId][lay_table_index][key] = saveValue;
+        fixTableHeight({
+            tr: _$.find('tr[data-index="' + lay_table_index + '"]'),
+            field: key,
+            value: showValue,
+        })
+    }
+
+}
+
+
+//项目检验，实测值、技术要求change事件
+function inputChange4Pd(obj,flag,tableId){
+    if(obj) {
+        let value, data, field,tr,index;
+        if (flag == 'jsyq') {//技术要求改变
+            field = 'tec_requirements';
+            tr = $(obj).parents("tr:first") ;
+            index = tr.attr('data-index');//当前行
+            data = table.cache[tableId][index];//当前行对象数据
+        }else if (flag.indexOf("scz") != -1) {//实测值改变
+            field = flag;
+            tr = $(obj).parents("tr:first");
+            index = tr.attr('data-index');//当前行
+            data = table.cache[tableId][index];//当前行对象数据
+        }else {//其他值改变
+            field = obj.field; //得到字段
+            value = obj.value; //得到修改后的值
+            data = obj.data; //得到所在行所有键值
+            tr = obj.tr ;
+            index = $(tr).attr('data-index');//当前行
+        }
+        let zxzName = table.cache[tableId][index].zu_name;
+        //如果修改的是实测值、技术要求，则进行计算
+        if (field.indexOf("scz") != -1 || field == "tec_requirements") {
+            if(tr.children('td[data-field="dxjl"]').find(".dxjl_val").length==0){
+                return ;
+            }
+            let sczArr = [data.scz];
+            sczFor:
+                for (let i = 2; i <= 10; i++) {
+                    if (data["scz" + i] != null) {
+                        sczArr[sczArr.length] = data["scz" + i]
+                    } else {
+                        break sczFor;
+                    }
+                }
+            let pdRes = dxpd_simple_slt1(data.tec_requirements,sczArr,Number(index)+1,zxzName);
+            let dxpd = userPdlx;
+            let val = "" ;
+            if (pdRes == 1) {
+                val = dxpd.satisfied_value ;
+            } else if (pdRes == 0) {
+                val = dxpd.unsatisfied_value ;
+            }
+            if(pdRes == 1 || pdRes == 0){
+                tr.children('td[data-field="dxjl"]').find(".dxjl_val").html(val == "" ? defaultSpace:val);
+                table.cache[tableId][index]["dxjl"]=val;
+                dxpdChange(tr.children('td[data-field="dxjl"]'),tableId);
+            }
+            if(field.indexOf("scz") != -1 && !!tr.children('td[data-field="'+field+'"]').find("."+field+"_val").text().trim()){//若填写了实测值，同时实测值填写不为空
+                tr.children('td[data-field="zxr_name"]').find(".zxr_name_val").html(localStorage.getItem("userName"));
+                table.cache[tableId][index].zxr_name=localStorage.getItem("userName");
+                table.cache[tableId][index].zxr=localStorage.getItem("userId");
+            }
+            form.render('select');
+        }
+    }
+}
+
+/**
+ * 单向判定修改事件
+ */
+function dxpdChange(obj,tableId) {
+    let tr = $(obj).parents("tr:first") ;
+    index = tr.attr('data-index');//当前行
+    data = table.cache[tableId][index];//当前行对象数据
+    let val = data.dxjl ;
+    //找到当前操作的行
+    let trArr = tableInfo.config.elem.next().find('tr[data-index="' + index + '"]');
+    if(val!= undefined && val.indexOf("不") != -1){
+        trArr.css({"background":"#FA8072"});
+    }else {
+        trArr.css({"background":"rgb(255, 255, 255)"});
+    }
+}
+/**
+ * 执行人修改事件
+ */
+function zxrChange(obj,tableId) {
+    let tr = $(obj).parents("tr:first") ;
+    index = tr.attr('data-index');//当前行
+    data = table.cache[tableId][index];//当前行对象数据
+    console.log(data);
+}
+/**
+ * 触发单向判定修改事件
+ */
+function initDxpdChange(tableId) {
+    let td = tableInfo.config.elem.next().find('td[data-field="dxjl"]');
+    for(let i=0;i<td.length;i++){
+        dxpdChange(td.eq(i),tableId);
+    }
+}
+
+
+//渲染技术要求autoComplete样式
+function doAutoCompleteStyle(data){
+    let jsyq = data.tr.find("input[name='jsyq']")[data.tr.find("input[name='jsyq']").length-1] ;
+    if(jsyq){
+        var cellWidth = $(jsyq)[0].offsetWidth;//单元格宽度
+        var leftOffset = $(jsyq).offset().left;//技术要求input距离屏幕左边的宽度
+        var topOffset = $(jsyq).offset().top+$(jsyq).height();//技术要求input距离屏幕上方的高度
+        $($.find('.layui-form-autocomplete dl')).eq($(jsyq).attr("autoComplateIndex")).css('min-width',cellWidth+'px');
+        // $($.find('.layui-form-autocomplete dl')).css('width','auto');
+        $($.find('.layui-form-autocomplete dl')).eq($(jsyq).attr("autoComplateIndex")).css('text-align','left');
+        $($.find('.layui-form-autocomplete')).eq($(jsyq).attr("autoComplateIndex")).css('z-index','9999');
+        $($.find('.layui-form-autocomplete')).eq($(jsyq).attr("autoComplateIndex")).css('position','fixed');
+        $($.find('.layui-form-autocomplete')).eq($(jsyq).attr("autoComplateIndex")).css('left',leftOffset);
+        $($.find('.layui-form-autocomplete')).eq($(jsyq).attr("autoComplateIndex")).css('top',topOffset);
+    }
+}
+
+function jugeNull(obj){
+    if(obj==null || obj ==undefined){
+        return '';
+    }
+    return obj;
+}
+
+
+/**
+ * 保存的时候添加到单位库（业务受理、报告、抽样登记、批量修改用到）
+ * @param dwName
+ */
+function saveToaddWtdw(companyName,frameName) {
+    let res = "0" ;
+    var _$ = $(window.frames[frameName].document);
+    var obj = new Object();
+    obj.addUser = localStorage.getItem("userId");
+    obj.companyName = _$.find("#" + companyName).val();
+    obj.address = _$.find("#" + companyName + "_lxdz").val();
+    obj.contacter = _$.find("#" + companyName + "_lxr").val();
+    obj.telephone = _$.find("#" + companyName + "_lxdh").val();
+    obj.mobilePhone = _$.find("#" + companyName + "_sj").val();
+    obj.postCode = _$.find("#" + companyName + "_yb").val();
+    obj.provinceId = _$.find("#" + companyName + "_province").val();
+    obj.cityId = _$.find("#" + companyName + "_city").val();
+    obj.areaId = _$.find("#" + companyName + "_region").val();
+    obj.frdb = _$.find("#" + companyName + "_frdb").val();
+    if (companyName == "sjdw" || companyName == "scdw") {
+        obj.yyzz = _$.find("#" + companyName + "_yyzz").val();
+        obj.jgdm = _$.find("#" + companyName + "_jgdm").val();
+    }
+    if (companyName == "scdw") {
+        obj.qygm = _$.find("#scdw_qygm").val();
+        obj.qygmRs = _$.find("#scdw_qygm_rs").val();
+        obj.qygmCz = _$.find("#scdw_qygm_cz").val();
+        obj.qygmCl = _$.find("#scdw_qygm_cl").val();
+        obj.saleAmount = _$.find("#scdw_sale_amount").val();
+        var scdw_economic_style = "";
+        $.each($("[name='QY']:checked"), function (i, d) {
+            scdw_economic_style += d.value + ",";
+        });
+        obj.economicStyle = scdw_economic_style;
+        _$.find("#scdw_economic_style").val(scdw_economic_style);
+    }
+
+    $_PostSync("/qc/zjSjd/addCompany", obj, function (result) {
+        if (result.code == 0) {
+            _$.find("#" + companyName + "_id").val(result.data.id);
+            res = "1";
+        }else{
+            res = "0";
+        }
+    });
+    return res ;
+}
+
+/**
+ * 获取本地存储的生成报告编号方法
+ * @returns {*|Array}
+ */
+function getBgbhCreateFun() {
+    var array = [];
+        //获取本地存储的生成报告编号方法
+        array = getConfig("bgbh_create_method").value.split(";");
+    return array;
+}
+//选择项目时，单击行勾选checkbox事件
+function clickRowForCheck(){
+    $(document).on("click",".layui-table-body table.layui-table tbody tr td", function () {
+        let tableDiv;
+        //获取鼠标点击的当前列的rowspan
+        let cellNum = ($(this).attr("rowSpan") == undefined) ? 1 : (eval($(this).attr("rowSpan")))
+        //获取鼠标点击的当前列所在行的index
+        let index = $(this).parent().attr('data-index');
+        let tableBox = $(this).parent().parents('.layui-table-box');
+        //存在固定列
+        if (tableBox.find(".layui-table-fixed.layui-table-fixed-l").length>0) {
+            tableDiv = tableBox.find(".layui-table-fixed.layui-table-fixed-l");
+        } else {
+            tableDiv = tableBox.find(".layui-table-body.layui-table-main");
+        }
+        var checkCell;
+        if($(this).attr("data-field")!="tec_requirements" && $(this).attr("data-field")!="test_way"){
+            if(cellNum==1){
+                //获取行的checkbox
+                checkCell = tableDiv.find("tr[data-index=" + Number.parseInt(index) + "]").find("td div.laytable-cell-checkbox div.layui-form-checkbox I");
+                if (checkCell.length>0) {
+                    checkCell.click();
+                }
+            }else{//勾选合并行的checkbox
+                let checkFlag;
+                for(var i=0;i<cellNum;i++){
+                    //获取行的checkbox
+                    let nowIndex = Number.parseInt(index)+Number.parseInt(i);
+                    checkCell = tableDiv.find("tr[data-index=" + Number.parseInt(nowIndex) + "]").find("td div.laytable-cell-checkbox div.layui-form-checkbox I");
+                    if(i>0){
+                        //如果第一行checkbox选择的状态和其他选择的行不一样才会checkbox勾选操作。例如：大项勾选自动勾选了小项，就无需再checkbox勾选操作
+                        if(checkFlag != tableDiv.find("tr[data-index="+nowIndex+"]").find("td div.laytable-cell-checkbox div.layui-form-checkbox").hasClass('layui-form-checked') && checkCell.length>0){
+                            checkCell.click();
+                        }
+                    }else{
+                        if (checkCell.length>0) {
+                            checkCell.click();
+                        }
+                    }
+                    if(i==0){
+                        checkFlag = tableDiv.find("tr[data-index="+Number.parseInt(index)+"]").find("td div.laytable-cell-checkbox div.layui-form-checkbox").hasClass('layui-form-checked');//判定第一行是否选择,选择返回true，未选择返回false
+                    }
+                }
+            }
+        }
+    });
+
+//阻止js事件冒泡
+    $(document).on("click", "td div.laytable-cell-checkbox div.layui-form-checkbox", function (e) {
+        e.stopPropagation();
+    });
+}
+if(typeof $ != "undefined"){
+    if(getConfig("noAutoSelectAll").value != "1"){
+        // 设置不设置全选
+        $(document).on("focus",'input',function(){
+            console.log("全选")
+            this.select();
+        });
+        // 设置不设置全选
+        $(document).on("focus",'textarea',function(){
+            console.log("全选")
+            this.select();
+        });
+    }
+
+    // 设置 autocomplete="off"
+    $("input",document).attr("autocomplete","off");
+}
+
+/**
+ * 设置table行高
+ * @param el
+ */
+function setTableHeight(el) {
+    console.log("开始了",new Date())
+    let tbody =  el.find('.layui-table-box tbody') ;
+    if(tbody.length >1){
+        let tr = el.find('.layui-table-main tr') ;
+        let tr01 = tbody.eq(1).find('tr') ;
+        let tr02 = tbody.eq(2).find('tr') ;
+        let heightTempArr = [];
+        for(let trI = 0;trI< tr.length;trI++){
+            let heightTemp = tr.eq(trI).height() ;
+            heightTempArr[trI] = heightTemp ;
+        }
+        el.hide();
+        for(let trI = 0;trI< tr.length;trI++){
+            // let heightTemp = tr.eq(trI).height() ;
+            let heightTemp = heightTempArr[trI] ;
+            // el.find(".layui-table-fixed-l .layui-table-body tbody tr").eq(trI).height(heightTemp);
+            // el.find(".layui-table-fixed-r .layui-table-body tbody tr").eq(trI).height(heightTemp);
+            tr01.eq(trI).height(heightTemp);
+            tr02.eq(trI).height(heightTemp);
+            // 设置鼠标事件
+            tr.eq(trI).bind("mouseover",function(){
+                tr.eq(trI).addClass("onMouseoverCss");
+                tr01.eq(trI).addClass("onMouseoverCss");
+                tr02.eq(trI).addClass("onMouseoverCss");
+            }).bind("mouseout",function(){
+                tr.eq(trI).removeClass("onMouseoverCss");
+                tr01.eq(trI).removeClass("onMouseoverCss");
+                tr02.eq(trI).removeClass("onMouseoverCss");
+            })
+            tr01.eq(trI).bind("mouseover",function(){
+                tr.eq(trI).addClass("onMouseoverCss");
+                tr01.eq(trI).addClass("onMouseoverCss");
+                tr02.eq(trI).addClass("onMouseoverCss");
+            }).bind("mouseout",function(){
+                tr.eq(trI).removeClass("onMouseoverCss");
+                tr01.eq(trI).removeClass("onMouseoverCss");
+                tr02.eq(trI).removeClass("onMouseoverCss");
+            })
+            tr02.eq(trI).bind("mouseover",function(){
+                tr.eq(trI).addClass("onMouseoverCss");
+                tr01.eq(trI).addClass("onMouseoverCss");
+                tr02.eq(trI).addClass("onMouseoverCss");
+            }).bind("mouseout",function(){
+                tr.eq(trI).removeClass("onMouseoverCss");
+                tr01.eq(trI).removeClass("onMouseoverCss");
+                tr02.eq(trI).removeClass("onMouseoverCss");
+            })
+        }
+        el.show();
+        console.log("结束了",new Date())
+    }
+    // 调整表头高度(防止拖拽后列表错位)
+    let tHeader = el.find('.layui-table-header');
+    if (tHeader.length > 1) {
+        let tHearderHeight;
+        let initLength = [tHeader.length];
+        // 循环表头
+        for (let i = 0; i < tHeader.length; i++) {
+            // 找到表头列数多的
+            initLength.push(tHeader.eq(i).find('tr').find('th').length);
+        }
+        var max = Math.max.apply(Math, initLength);
+        for (let i = 0; i < tHeader.length; i++) {
+            if (max == tHeader.eq(i).find('tr').find('th').length) {
+                // 获取高度
+                tHearderHeight = tHeader.eq(i).find('tr').find('th').height();
+            }
+        }
+        // 给表头都设置统一高度
+        if (tHearderHeight > 0) {
+            for (let i = 0; i < tHeader.length; i++) {
+                tHeader.eq(i).height(tHearderHeight);
+                tHeader.eq(i).find('tr').height(tHearderHeight);
+                tHeader.eq(i).find('tr').find('th').height(tHearderHeight)
+            }
+        }
+    }
+}
+
+/**
+ * 修正行高
+ */
+function fixTableHeight(obj) {
+    // 所有的tr
+    let tr = obj.tr ;
+    // 修改的字段
+    let field = obj.field ;
+    let value = obj.value ;
+    if(tr.length>1){
+        for(let i=tr.length-1;i>0;i--){
+            if($(tr[i]).find("[data-field='"+field+"']").length == 1 ){
+                $(tr[0]).find("[data-field='"+field+"'] div").html(value)
+                break ;
+            }
+        }
+        setTimeout(()=>{
+            for(let i=1;i<tr.length;i++){
+                $(tr[i]).height($(tr[0]).height())
+            }
+        })
+    }
+}
+
+/*显示toolTips*/
+function showToolTip(lay,elm,text,tipPlace){
+    let subtips;
+    if(tipPlace == undefined){
+        tipPlace = 3 ;
+    }
+    $(elm).hover(function(e){
+        subtips = lay.tips(text, e.target, {
+            tips: [tipPlace, '#78BA32'],time:1000000
+        });
+    },function(){
+        lay.close(subtips);
+    });
+}
+
+let hideStr = "*";
+let isOpenBlindTest = getConfig("isOpenBlindTest").value;
+let isPowerBlindTest = userBtnPower.indexOf('@M100105004') != -1
+/**
+ * 盲样检测 隐藏信息
+ */
+function hideInfo4BlindTest(str) {
+    if(!str){
+        return "";
+    }if("1"!=isOpenBlindTest || ("1"==isOpenBlindTest && isPowerBlindTest)){
+        return str;
+    }else if(str.length <=2){
+        return replacepos(str,0,str.length,hideStr); ;
+    }else if(str.length <=4){
+        return replacepos(str,1,str.length-1,hideStr); ;
+    }else {
+        return replacepos(str,2,str.length-2,hideStr); ;
+    }
+
+}
+
+function replacepos(text,start,stop,replacetext){
+    let mystr = text.substring(0,start)+replacetext.repeat(stop-start)+text.substring(stop);
+    return mystr;
+}
+
+
+/**
+ * 比较日期
+ * @param date1
+ * @param date2
+ * @returns boolean   date1 > date2
+ */
+function dateCompare(date1, date2) {
+    if (date1 == null || date2 == null) {
+        return false;
+    }
+    if (date1 == "" || date2 == "") {
+        return false;
+    }
+    let data1Arr = date1.split("-");
+    let date1Date = new Date(data1Arr[0], data1Arr[1] - 1, data1Arr[2]);
+    let date1Time = date1Date.getTime();
+
+    let data2Arr = date2.split("-");
+    let date2Date = new Date(data2Arr[0], data2Arr[1] - 1, data2Arr[2]);
+    let date2Time = date2Date.getTime();
+
+    if (date1Time > date2Time) {
+        return true;
+    } else
+        return false;
+
+}
+
+/**
+ * 查询是否包含数字，返回数字的下标，未找到则返回-1
+ * @param arr
+ * @returns {boolean}
+ */
+function judegNumIndex(arr){
+    let numIndex = -1;
+    for(var i = 0;i<arr.length; i++){
+        if(Number(arr[i])){
+            numIndex = i;
+            break;
+        }
+    }
+    return numIndex;
+}
+
+/**
+ * 判断是否包含合格的特殊符号
+ * @param str
+ * @returns {boolean}
+ */
+function hasSpecial(str){
+    var pattern = new RegExp("[`~≥＞>≧≤<≦=±]");
+    if (pattern.test(str)){
+        return true;
+    }
+    return false;
+}
+/**
+ * 校验日期格式
+ */
+function CheckDate(strDate)
+{
+    var  reg =/^(\d{4})-(\d{2})-(\d{2})$/;
+    if (!reg.test(strDate))
+    {
+        return   false;
+    }
+    var ss = strDate.split("-");
+    var year = ss[0];
+    var month = ss[1];
+    var date = ss[2];
+    if (!checkYear(year))
+    {
+        return   false;
+    }
+    if (!checkMonth(month))
+    {
+        return   false;
+    }
+    if (!checkDate(year, month, date))
+    {
+        return   false;
+    }
+    return   true;
+}
+function checkYear(year)
+{
+    if (isNaN(parseInt(year, 10)))
+    {
+        //  alert("年份输入有误,请重新输入!");
+        return   false;
+    }
+    else   if (parseInt(year, 10) < 1950 || parseInt(year, 10) > 2050)
+    {
+        //   alert("年份应该在1950-2050之间!");
+        return   false
+    }
+    else   return   true;
+}
+function checkMonth(month)
+{
+    if (isNaN(parseInt(month, 10)))
+    {
+        //  alert("月份输入有误,请重新输入!");
+        return   false;
+    }
+    else   if (parseInt(month, 10) < 1 || parseInt(month, 10) > 12)
+    {
+        //  alert("月份应该在1-12之间!");
+        return   false
+    }
+    else   return   true;
+}
+function checkDate(year, month, date)
+{
+    var daysOfMonth = CalDays(parseInt(year, 10), parseInt(month, 10));
+    if (isNaN(parseInt(date, 10)))
+    {
+        // alert("日期输入有误,请重新输入!");
+        return   false;
+    }
+    else   if (parseInt(date, 10) < 0 || parseInt(date, 10) > daysOfMonth)
+    {
+        // alert("日期应该在1-" + daysOfMonth + "之间!");
+        return   false;
+    }
+    else   return   true;
+}
+function CalDays(year, month)
+{
+    var days = 0;
+    switch (month)
+    {
+        case   1:   case   3:   case   5:   case   7:   case   8:   case   10:   case   12:   days = 31;break;
+        case   4:   case   6:   case   9:   case   11:   days = 30;break;
+        case   2:   if (isLeapYear(year))   days = 29;
+        else   days = 28;
+            break;
+    }
+    return   days;
+}
+function isLeapYear(year)
+{
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))   return   true;
+    else   return   false;
+}
+// 判断是否为空、未定义、null
+function isEmpty(obj){
+    if(typeof obj == "undefined" || obj == null || obj == ""){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+/**
+ * 初始化表格中的勾选框,绑定点击事件
+ * @param selector
+ */
+function  initTableCheckboxEvent(selector) {
+    let checkboxs = document.querySelectorAll(selector);
+    checkboxs.forEach(checkbox => checkbox.addEventListener('click', enableShiftCheck));//绑定点击事件
+    for(let i=0;i<checkboxs.length;i++){ //绑定checkbox鼠标右击事件
+        let DOM = checkboxs[i];
+        DOM.oncontextmenu = function(e){
+            e.preventDefault();
+        };
+        DOM.onmouseup=function(oEvent) {
+            if (oEvent.button==2) {
+                enableShiftCheck(DOM,"rightClick");
+            }
+        }
+    }
+    boxArr = Array.from(checkboxs);
+}
+/**
+ * 利用数组索引获取需要选中的范围并勾选
+ */
+function enableShiftCheck(e,clickFlag) {
+    if(clickFlag=="rightClick"){ //暂时使用鼠标右击可以单选
+        let flag = $(e).hasClass("layui-form-checked");//是否已勾选
+        if(flag){
+            $(e).removeClass("layui-form-checked");
+        }else {
+            $(e).addClass("layui-form-checked");
+        }
+        $(e).siblings().prop('checked', !flag);
+        table.cache[tableId][boxArr.indexOf(e)]["LAY_CHECKED"] = !flag;
+    }else{
+        if(!startChecked){
+            startChecked = this;
+        }
+        if(e.shiftKey) {
+            let start = boxArr.indexOf(startChecked);//开始选中的位置
+            let end = boxArr.indexOf(this);//结束选中的位置
+            boxArr.slice(Math.min(start, end), Math.max(start, end) + 1).forEach(
+                function(item,i){
+                    if($(startChecked).hasClass("layui-form-checked")){
+                        $(item).addClass("layui-form-checked");
+                        table.cache[tableId][Math.min(start, end)-1+i]["LAY_CHECKED"] = true;
+                        $(item).siblings().prop('checked', true);
+                    }else{
+                        $(item).removeClass("layui-form-checked");
+                        table.cache[tableId][Math.min(start, end)-1+i]["LAY_CHECKED"] = false;
+                        $(item).siblings().prop('checked', false);
+                    }
+                }
+            );
+        }else{
+            largeAndSmallSelect(this,largeRelSmall);
+        }
+        startChecked = this;
+    }
+}
+
+
+/**
+ * 设置大项、小项的关联关系
+ */
+function largeAndSmallSelect(obj,largeRelSmall) {
+    let tableInfo = table.cache[tableId];
+    let index = boxArr.indexOf(obj);//第一行的多选框去除
+    if(index<=0){
+        return;
+    }
+    let biaoshi = tableInfo[index-1].biao_shi;//项目标识0：子项 1：父项
+    let id = !!tableInfo[index-1].item_id ? tableInfo[index-1].item_id :tableInfo[index-1].id;//项目标识id
+    let fbiaoshi = tableInfo[index-1].fbiao_shi;//父项目标识id
+    let name1 = tableInfo[index-1].name1;//项目名称1
+    let flag = $(obj).hasClass("layui-form-checked");//是否勾选
+    if(biaoshi=="1"){//大项
+        for(let i=0;i< tableInfo.length;i++){
+            if(tableInfo[i].fbiao_shi==id && tableInfo[i].name1 == name1){
+                let DOM = boxArr[i+1];
+                if(flag){
+                    $(DOM).addClass("layui-form-checked");
+                }else {
+                    $(DOM).removeClass("layui-form-checked");
+                }
+                tableInfo[i]["LAY_CHECKED"] = flag;
+                $(DOM).siblings().prop('checked', flag);
+            }
+        }
+    }else { //小项
+        if(!!fbiaoshi && largeRelSmall =="largeRelSmall"){
+            for(let i=0;i< tableInfo.length;i++){
+                let id = !!tableInfo[i].item_id ? tableInfo[i].item_id :tableInfo[i].id;//项目标识id
+                if(id==fbiaoshi && tableInfo[i].name1 == name1){
+                    let DOM = boxArr[i+1];
+                    if(flag){
+                        $(DOM).addClass("layui-form-checked");
+                    }else {
+                        $(DOM).removeClass("layui-form-checked");
+                    }
+                    tableInfo[i]["LAY_CHECKED"] = flag;
+                    $(DOM).siblings().prop('checked', flag);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 给sjdtable再点击的时候加背景色
+ * @param sjdId
+ * @param table
+ */
+function setTableRowBgColor(newSjdId,oldSjdId,tableId,vesselTemp,tableTemp) {
+    let el = vesselTemp.currentTable.config.elem.next()
+    let tableDate = tableTemp.cache[tableId]
+    let tbody =  el.find('.layui-table-box tbody') ;
+    let tr = el.find('.layui-table-main tr') ;
+    let tr01 = tbody.eq(1).find('tr') ;
+    let tr02 = tbody.eq(2).find('tr') ;
+    tableDate.map(function (item, index) {
+        // 当前选中行
+        if (newSjdId == item.id) {
+            tr.eq(index).addClass("onSjdChoosedCss");
+            tr01.eq(index).addClass("onSjdChoosedCss");
+            tr02.eq(index).addClass("onSjdChoosedCss");
+            // 加急,并且为江阴质检请求时,附加加急样式
+            // if (item.sfjj == 1 && "2" == localStorage.getItem("depBusinessType")) {
+            if (item.sfjj == 1) {
+                tr.eq(index).removeClass("onSjdSfjjChoosedCss");
+                tr01.eq(index).removeClass("onSjdSfjjChoosedCss");
+                tr02.eq(index).removeClass("onSjdSfjjChoosedCss");
+            }
+        } else {
+            // 加急,并且为江阴质检请求时,去除加急样式
+            // if (item.sfjj == 1 && "2" == localStorage.getItem("depBusinessType")) {
+            // 加急
+            if (item.sfjj == 1) {
+                tr.eq(index).addClass("onSjdSfjjChoosedCss");
+                tr01.eq(index).addClass("onSjdSfjjChoosedCss");
+                tr02.eq(index).addClass("onSjdSfjjChoosedCss");
+            }
+        }
+        // 上一行跟当前点击的不是同一行时,去除选中的样式
+        if (oldSjdId == item.id && newSjdId != oldSjdId) {
+            tr.eq(index).removeClass("onSjdChoosedCss");
+            tr01.eq(index).removeClass("onSjdChoosedCss");
+            tr02.eq(index).removeClass("onSjdChoosedCss");
+        }
+    })
+    // 若是质检请求-加入加急样式描述
+    // 说明的顺序
+    let order = $('#zjTableRow').attr('data-value');
+    if(!isEmpty(order)){
+        $("#zjTableRow").html(order+'、加急的受理单，整体背景色为绿色。');
+    }
+}
+
+/**
+ * 判断字符是否都是中文字符
+ * @param str
+ * @returns {boolean}
+ */
+function isChina(str) {
+    return  /^[\u4E00-\u9FA5]+$/.exec(str)? true :false;
+    //return /[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi.exec(str)? true :false;
+}
+
+// 左右拖拉
+function changed(nowLayerId){
+    widths=$("#layui-layer"+nowLayerId)[0].offsetLeft
+    $("#layui-layer"+nowLayerId).append('<div style="position:absolute;top: 0;left:-3px;width: 100%;height: 100%;z-index:100000;" class="dd" onclick="ddClick()"></div>')
+    document.onmouseover=function(evt){
+        var e = event || window.event;
+        var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+        var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+        var x = e.pageX || e.clientX + scrollX;
+        var y = e.pageY || e.clientY + scrollY;
+        if(x-widths<5&&x-widths>-5){
+            $(".dd").css({"display":'block'})
+            $("#layui-layer"+nowLayerId).append('<div style="position:absolute;top: 0;left:-6px;width: 6px;height: 100%;z-index:1000000;cursor:col-resize" class="borderDiv" onmousedown="mousedowns('+x+','+nowLayerId+')"></div>')
+        }
+        if(x-widths>6||x-widths<-6){
+            $(".dd").css({"display":'none'})
+            $(".borderDiv").remove()
+        }
+    }
+}
+function ddClick(){
+    $(".dd").css({"display":'none'})
+}
+
+function mousedowns(x,nowLayerId){
+    let ww=$("#layui-layer"+nowLayerId).width()
+    $("#layui-layer"+nowLayerId).on("selectstart",function () {
+        return false
+    })
+    let anx=0
+    document.onmousemove = function(ev) {
+        isZytlgc=1
+        anx=1
+        var o = event || ev;
+    }
+    //当鼠标按键抬起，清除移动事件
+    document.onmouseup = function(ev) {
+        var o = event || ev;
+        if(o.clientX>0&&anx==1){
+            widths=o.clientX
+            $("#layui-layer"+nowLayerId).css({"left":o.clientX+"px","width":ww+(x-o.clientX)+1+"px"})
+            anx=0
+        }
+        document.onmousedown = null;
+        document.onmousemove = null;
+        $(".borderDiv").remove()
+        $(".moveDiv").remove()
+        $(".dd").css({"display":'none'})
+        isZytlgc=0
+    }
+    // $(".borderDiv").remove()
+}
+
+
+function layConfirmEnterEsc(event){
+    if (event.keyCode === 13) {
+        $(".layui-layer-btn0").click();
+        return false; //阻止系统默认回车事件
+    }else if(event.keyCode == 27){
+        $(".layui-layer-btn1").click();
+        return false;
+    }
+}
+
+//通用用实验室认章数据处理
+function commonSqjgIdArrayHandle(dataSelect,type) {
+    var tempArray = [];
+    if(dataSelect!=null && dataSelect.length>0){
+        var isboolen = true;//对于数组中是否存在空值的判断
+        var arrs = [];
+        for (let i = 0; i < dataSelect.length; i++) {
+            if(dataSelect[i].SQJGID!=undefined && dataSelect[i].SQJGID!=""){
+                var arryTemp = dataSelect[i].SQJGID.split(",");
+                arrs.push(arryTemp);
+            }else {
+                isboolen = false;//如果数组中存在一组对象里的授权机构ID为空，则设为false
+            }
+        }
+        if(isboolen){
+            tempArray = innerJoinData(arrs);
+        }
+    }
+    if(tempArray != undefined && tempArray.length > 0){
+        // if(type == 'ywsl'){//类型为业务受理的情况下，是对inpu框的中的内容进行赋值
+        //     document.getElementById("lab_rkz_id").value = tempArray.toString();
+        // }else {
+        if(typeof window.parent.setFormSelectVal == "function"){
+            window.parent.setFormSelectVal(tempArray);//将交集的tempArray内容存放到实验室认章中
+        }
+        // }
+        return tempArray.toString();
+    }else {
+        // if(type == 'ywsl'){//类型为业务受理的情况下，是对inpu框的中的内容进行赋值
+        //     document.getElementById("lab_rkz_id").value = tempArray.toString();
+        // }else {
+        if(typeof window.parent.setFormSelectVal == "function") {
+            window.parent.setFormSelectVal(tempArray);//将交集的tempArray内容存放到实验室认章中
+        }
+        // }
+        return tempArray.toString();
+    }
+}
+//对授权机构ID的交集数据的处理
+function innerJoinData(arrs) {
+    let tempArray = []
+    for (let i = 0; i < arrs.length; i++) {
+        if(i==0){
+            tempArray = arrs[i]
+        }else {
+            tempArray = tempArray.filter(function(v){return arrs[i].indexOf(v) > -1 })
+        }
+    }
+    var tempArraystr = [];
+    for (let i = 0; i < tempArray.length; i++) {
+        if(tempArray[i]!=undefined && tempArray[i]!="" ){
+            tempArraystr.push(tempArray[i]);
+        }
+    }
+    return tempArraystr;
+}
+
+function copyJyyj() {//同检验依据按钮，点击将检验依据内容覆盖到判定依据当中
+    let jyyjData = getXmSelect("jyyj");
+    setXmSelect("pdyj",jyyjData);
+}
+// 表格多选框拖拽选中
+function checkboxTz(){
+// 对td的单击事件进行拦截停止，防止事件冒泡再次触发上述的单击事件（Table的单击行事件不会拦截，依然有效）
+    $(document).on('click', 'td div.laytable-cell-checkbox div.layui-form-checkbox', function (e) {
+        // e.stopPropagation();
+    });
+    let downnum=0,upnum=0,tableIndex=0
+    $(document).on("mousedown", '.layui-table-body table.layui-table tbody tr', function (e) {
+        tableIndex=$(this).parents(".layui-table-view").attr('lay-filter')
+        downnum=this.rowIndex
+    });
+    $(document).on("mouseup", '.layui-table-body table.layui-table tbody tr', function (e) {
+        let tableDiv;
+        if(isZytlgc==0){
+            if(tableIndex==$(this).parents(".layui-table-view").attr('lay-filter')){
+                upnum=this.rowIndex
+                if(downnum<upnum){
+                    for(let i=downnum;i<=upnum;i++){
+                        let index = i;
+                        let tableBox = $(this).parents('.layui-table-box');
+                        //存在固定列
+                        if (tableBox.find(".layui-table-fixed.layui-table-fixed-l").length > 0) {
+                            tableDiv = tableBox.find(".layui-table-fixed.layui-table-fixed-l");
+                        } else {
+                            tableDiv = tableBox.find(".layui-table-body.layui-table-main");
+                        }
+                        var checkCell = tableDiv.find('tr[data-index=' + index + ']').find('td div.laytable-cell-checkbox div.layui-form-checkbox I');
+                        if (checkCell.length > 0) {
+                            checkCell.click();
+                        }
+                    }
+                }else if(upnum<downnum){
+                    for(let i=upnum;i<=downnum;i++){
+                        let index = i;
+                        let tableBox = $(this).parents('.layui-table-box');
+                        //存在固定列
+                        if (tableBox.find(".layui-table-fixed.layui-table-fixed-l").length > 0) {
+                            tableDiv = tableBox.find(".layui-table-fixed.layui-table-fixed-l");
+                        } else {
+                            tableDiv = tableBox.find(".layui-table-body.layui-table-main");
+                        }
+                        var checkCell = tableDiv.find('tr[data-index=' + index + ']').find('td div.laytable-cell-checkbox div.layui-form-checkbox I');
+                        if (checkCell.length > 0) {
+                            checkCell.click();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+}
+// 表格多选框拖拽选中
+function checkboxTz2(){
+// 对td的单击事件进行拦截停止，防止事件冒泡再次触发上述的单击事件（Table的单击行事件不会拦截，依然有效）
+    $(document).on('click', 'td div.laytable-cell-checkbox div.layui-form-checkbox', function (e) {
+        // e.stopPropagation();
+    });
+    let downnum=0,upnum=0,tableIndex=0
+    $(document).off("mousedown", '.layui-table-body table.layui-table tbody tr', checkboxTz_mousedown);
+    $(document).on("mousedown", '.layui-table-body table.layui-table tbody tr', checkboxTz_mousedown);
+    $(document).off("mouseup", '.layui-table-body table.layui-table tbody tr', checkboxTz_mouseup);
+    $(document).on("mouseup", '.layui-table-body table.layui-table tbody tr', checkboxTz_mouseup);
+
+}
+
+function checkboxTz_mousedown(e) {
+    tableIndex=$(this).parents(".layui-table-view").attr('lay-filter')
+    downnum=this.rowIndex
+}
+
+function checkboxTz_mouseup (e) {
+    let tableDiv;
+    if(isZytlgc==0){
+        if(tableIndex==$(this).parents(".layui-table-view").attr('lay-filter')){
+            upnum=this.rowIndex
+            if(downnum<upnum){
+                for(let i=downnum;i<=upnum;i++){
+                    let index = i;
+                    let tableBox = $(this).parents('.layui-table-box');
+                    //存在固定列
+                    if (tableBox.find(".layui-table-fixed.layui-table-fixed-l").length > 0) {
+                        tableDiv = tableBox.find(".layui-table-fixed.layui-table-fixed-l");
+                    } else {
+                        tableDiv = tableBox.find(".layui-table-body.layui-table-main");
+                    }
+                    var checkCell = tableDiv.find('tr[data-index=' + index + ']').find('td div.laytable-cell-checkbox div.layui-form-checkbox I');
+                    if (checkCell.length > 0) {
+                        checkCell.click();
+                    }
+                }
+            }else if(upnum<downnum){
+                for(let i=upnum;i<=downnum;i++){
+                    let index = i;
+                    let tableBox = $(this).parents('.layui-table-box');
+                    //存在固定列
+                    if (tableBox.find(".layui-table-fixed.layui-table-fixed-l").length > 0) {
+                        tableDiv = tableBox.find(".layui-table-fixed.layui-table-fixed-l");
+                    } else {
+                        tableDiv = tableBox.find(".layui-table-body.layui-table-main");
+                    }
+                    var checkCell = tableDiv.find('tr[data-index=' + index + ']').find('td div.laytable-cell-checkbox div.layui-form-checkbox I');
+                    if (checkCell.length > 0) {
+                        checkCell.click();
+                    }
+                }
+            }
+        }
+    }
+}
+// 特殊字符使用
+// function getFocus() {
+$(document).on('mouseleave',function(){
+    if(document.activeElement.tagName=='INPUT'||document.activeElement.tagName=='TEXTAREA'){
+        window.top['goBack'](document.activeElement)
+    }
+})
+
+
+/**
+ * 查询方法
+ */
+function getNowDate4Retrieve(flag){
+    let startDate ,endDate ;
+    if(flag == 1){//本年
+        startDate = new Date().getFullYear()+"-01-01";
+    }
+    if(flag == 2){//本季
+        var month = new Date().getMonth();
+        if(month <3 ){
+            startDate =  new Date().getFullYear()+"-01-01" ;
+        }else if(2 < month && month < 6){
+            startDate =  new Date().getFullYear()+"-04-01";
+        }else if(5 < month && month < 9){
+            startDate =  new Date().getFullYear()+"-07-01";
+        }else if(8 < month && month <= 11){
+            startDate =  new Date().getFullYear()+"-10-01";
+        }
+    }
+    if(flag == 3){//本月
+        var month = new Date().getMonth()+1;
+        month = month < 10 ? '0' + month : month;
+        startDate = new Date().getFullYear()+"-"+month+"-01";
+    }
+
+    endDate = new Date().format("YYYY-MM-DD") ;
+    return {
+        startDate:startDate,
+        endDate:endDate,
+    };
+}

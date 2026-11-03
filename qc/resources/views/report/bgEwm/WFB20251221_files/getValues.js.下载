@@ -1,0 +1,212 @@
+/**
+ * 抽取 id,name 同时不为空 表单对象值value
+ * value="#aaa" 这种配置可以关联取值：当前对象取id为aaa的对象值
+ * 获取指定对象内的对象值
+ */
+jQuery.fn.getValues = function(){
+	var jsonparam={};
+	//获取input控件值
+	$(this).find("input").each(function(i, row){
+		if('text'==row.type && typeof(row.name)!='undefined'){
+			if($.trim(row.value).indexOf("#")==0){
+				jsonparam[row.id]=$($.trim(row.value)).val();
+			}else{
+				jsonparam[row.id]=row.value;
+			}
+		}else if('hidden'==row.type && typeof(row.name)!='undefined'){
+			if($.trim(row.value).indexOf("#")==0){
+				jsonparam[row.id]=$($.trim(row.value)).val();
+			}else{
+				jsonparam[row.id]=row.value;
+			}
+		}else if('password'==row.type && typeof(row.name)!='undefined'){
+			if($.trim(row.value).indexOf("#")==0){
+				jsonparam[row.id]=$($.trim(row.value)).val();
+			}else{
+				jsonparam[row.id]=row.value;
+			}
+		}
+	});
+	//获取select控件值
+	$(this).find("select").each(function(i, row){
+		if( typeof(row.name)!='undefined'){
+			if($.trim(row.value).indexOf("#")==0){
+				jsonparam[row.id]=$($.trim(row.value)).val();
+			}else{
+				jsonparam[row.id]=row.value;
+			}
+		}
+	});
+	//获取textarea控件值
+	$(this).find("textarea").each(function(i, row){
+		if( typeof(row.name)!='undefined'){
+			if($.trim(row.value).indexOf("#")==0){
+				jsonparam[row.id]=$($.trim(row.value)).val();
+			}else{
+				jsonparam[row.id]=row.value;
+			}
+		}
+	});
+	//获取a控件值
+	$(this).find("a").each(function(i, row){
+		
+		if( typeof(row.name)!='undefined'){
+			if($.trim(row.value).indexOf("#")==0){
+				jsonparam[row.id]=$($.trim(row.href)).val();
+			}else{
+				jsonparam[row.id]=row.href;
+			}
+		}
+	});
+	return jsonparam;
+};
+
+
+
+/** 
+ //脚本获取网页中选中文字
+  var word = document.selection.createRange().text; 
+  
+  //获取选中文字所在的句子
+  var range =  document.selection.createRange();
+      range.expand("sentence");
+  var sentence = range.text;
+  
+  alert(word);//弹出选中的文字
+  alert(sentence );  
+ */
+
+
+//回车监控
+$(document).keydown(function(event){
+	  if(event.keyCode ==13 && $_inputKey.length>0){
+	  	console.log("$_enterKey")
+          keyUpFunctionCallBack("enter");
+	  }
+	  else if(event.keyCode ==27 && $_inputKey.length>0){
+	  	console.log("$_escKey")
+		  //先取焦点
+          keyUpFunctionCallBack("exit");
+	  }else {
+	  	if(typeof onKeyDownFunction4Self == "function"){
+            onKeyDownFunction4Self(event);
+		}
+	  }
+
+});
+
+function keyUpFunctionCallBack(type) {
+    //后取全局
+    $.each($_inputKey,function(id,ent){
+        if(typeof ent.tid == "string" ) {
+            if ('all' == ent["trigger"] && type == ent.type ) {
+                if (ent["fun"] == "this.click") {
+                    console.log($("#" + ent['tid']),"this.click 222")
+                    $("#" + ent['tid']).click();
+                } else {
+                    ent["fun"]();
+                }
+                if(ent.stopPropagation == true){
+                    return false;
+				}
+                return;
+            }
+        }else {
+            if ('all' == ent["trigger"] && type == ent.type ) {
+                if (ent["fun"] == "this.click") {
+                    console.log($(ent.tid),"this.click 333")
+                    $(ent.tid).click();
+                } else { 
+                    ent["fun"]();
+                }
+                if(ent.stopPropagation == true){
+                    return false;
+                }
+                return;
+            }
+        }
+    });
+}
+
+/**
+ * {"id":{trigger:"触发类型",fun:""}}
+ */
+var $_inputKey=[];
+
+
+//按升序排列
+function reverseMap4keys(){
+    $_inputKey = $_inputKey.reverse() ;
+}
+
+/**
+ * 回车触发（全局触发只能有一个）
+ * @param trigger 触发类型  = focus|
+ * focus:焦点触发 
+ * @param fun 指定触发执行方法 
+ * @param tid 触发执行id的click方法 fun无效
+ */
+jQuery.fn.enter = function(trigger,fun,tid,eleName,stopPropagation){
+	var id=	$(this).attr("id"); 
+	if(!fun){
+		fun="this.click";
+	}
+	if(!id){
+        id = eleName;
+	}
+	if(!tid){
+        tid=this;
+	}
+	if(id){
+		if(trigger){
+            $_inputKey[$_inputKey.length]={"trigger":trigger,"tid":tid,"fun":fun,"type":"enter","stopPropagation":stopPropagation,"eleName":eleName};
+		}else{
+            $_inputKey[$_inputKey.length]={"trigger":"all","tid":tid,"fun":fun,"type":"enter","stopPropagation":stopPropagation,"eleName":eleName};
+		}
+	}else{
+		console.log("无id，回车无法触发！");
+	}
+};
+/**
+ * ESC触发（全局触发只能有一个）
+ */
+jQuery.fn.exit = function(trigger,fun,tid,eleName,stopPropagation){
+	var id=	$(this).attr("id");
+	if(!fun){
+		fun="this.click";
+	}
+	if(!id){
+        id = eleName ;
+	}
+	if(!tid){
+		tid=this;
+	}
+	if(id){
+		if(trigger){
+            $_inputKey[$_inputKey.length]={"trigger":trigger,"tid":tid,"fun":fun,"type":"exit","stopPropagation":stopPropagation,"eleName":eleName};
+		}else{
+            $_inputKey[$_inputKey.length]={"trigger":"all","tid":tid,"fun":fun,"type":"exit","stopPropagation":stopPropagation,"eleName":eleName};
+		}
+	}else{
+		console.log("无id，回车无法触发！");
+	}
+};
+
+/**
+ * ESC触发（全局触发只能有一个）
+ */
+jQuery.fn.removeEnter = function(eleName){
+    $_inputKey = $_inputKey.filter(item => {
+        return eleName != item.eleName
+    })
+};
+
+/**
+ * ESC触发（全局触发只能有一个）
+ */
+jQuery.fn.removeExit = function(eleName){
+    $_inputKey = $_inputKey.filter(item => {
+        return eleName != item.eleName
+    })
+};
+
